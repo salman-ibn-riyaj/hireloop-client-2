@@ -61,13 +61,13 @@ export default function HireloopNavbar() {
           </Link>
 
           {/* Get Started Button */}
-          <Button
-            as={Link}
-            href="/register"
-            className="bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 text-white font-medium px-5 rounded-xl shadow-lg shadow-indigo-600/20 text-sm transition-all"
+          <Link
+            
+            href="/auth/signup"
+            className=" px-5 py-3 bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 text-white font-medium px-5 rounded-xl shadow-lg shadow-indigo-600/20 text-sm transition-all"
           >
             Get Started
-          </Button>
+          </Link>
         </div>
 
         {/* Mobile Hamburger Button (Hidden on Desktop) */}

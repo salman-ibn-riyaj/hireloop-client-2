@@ -25,6 +25,7 @@ export default function RootLayout({ children }) {
       lang="en"
       data-theme="dark"
       className={`${geistSans.variable} ${geistMono.variable} dark h-full antialiased`}
+      suppressHydrationWarning
     >
       <body className="min-h-full flex flex-col">
         <Navbar />
