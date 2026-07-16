@@ -54,7 +54,7 @@ export default function HireloopNavbar() {
 
           {/* Sign In Link */}
           <Link 
-            href="/login" 
+            href="/auth/signin" 
             className="text-indigo-400 hover:text-indigo-300 text-sm font-medium transition-colors"
           >
             Sign In
