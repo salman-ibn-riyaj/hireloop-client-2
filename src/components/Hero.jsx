@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import { motion } from "motion/react"
 
 export default function Hero() {
   const stats = [
@@ -63,6 +63,9 @@ export default function Hero() {
         <h2 className="text-2xl sm:text-4xl md:text-5xl font-normal text-zinc-300 max-w-3xl leading-tight tracking-tight px-4">
           Assisting over <span className="font-medium text-white">15,000 job seekers</span> find their dream positions.
         </h2>
+        <br />
+        <motion.p  animate={{ rotate: 360 }}>Remote Jobs</motion.p>
+        <motion.p initial={{ scale: .2 }} animate={{ scale: 1 }}>Onsite Jobs</motion.p>
 
         {/* Stats Grid Layout */}
         <div className="w-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mt-24 md:mt-36">
