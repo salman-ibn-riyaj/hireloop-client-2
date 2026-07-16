@@ -3,9 +3,16 @@
 import React, { useState } from "react";
 import { Link, Button } from "@heroui/react";
 import Image from "next/image";
+import { useSession, signOut } from "@/lib/auth-client";
 
 export default function HireloopNavbar() {
   const [isOpen, setIsOpen] = useState(false);
+  const {data: session, isPending} = useSession();
+  const {user}= session || {};
+
+  const handleSignOut = async () => {
+    await signOut();
+  };
 
   return (
     <div className="w-full bg-[#121212] py-4 px-4 sm:px-6 flex flex-col items-center relative z-50">
@@ -53,12 +60,16 @@ export default function HireloopNavbar() {
           <div className="h-4 w-[1px] bg-zinc-700 mx-1" />
 
           {/* Sign In Link */}
-          <Link 
+
+          {user? <>
+          Hi, {session?.user?.name} <Button onClick={handleSignOut} variant="ghost">Sign Out</Button>
+          </> :  <Link 
             href="/auth/signin" 
             className="text-indigo-400 hover:text-indigo-300 text-sm font-medium transition-colors"
           >
             Sign In
-          </Link>
+          </Link>}
+          
 
           {/* Get Started Button */}
           <Link
@@ -121,13 +132,14 @@ export default function HireloopNavbar() {
           <div className="border-t border-zinc-800 my-2" />
 
           <div className="flex flex-col gap-3">
-            <Link 
-              href="/login" 
-              onClick={() => setIsOpen(false)}
-              className="text-indigo-400 hover:text-indigo-300 text-base font-medium text-center py-2"
-            >
-              Sign In
-            </Link>
+            {user? <>
+          Hi, {session?.user?.name} <Button variant="ghost">Sign Out</Button>
+          </> :  <Link 
+            href="/auth/signin" 
+            className="text-indigo-400 hover:text-indigo-300 text-sm font-medium transition-colors"
+          >
+            Sign In
+          </Link>}
             <Button
               as={Link}
               href="/register"
