@@ -91,7 +91,7 @@ export default function Footer() {
 
         {/* Right Stack: Legals & Programming Hero Credits */}
         <div className="flex flex-col sm:flex-row items-center gap-2 sm:gap-6 text-xs text-zinc-600 text-center sm:text-right">
-          <p>Copyright 2024 — Programming Hero</p>
+          <p>Copyright 2026 — Salman Shah</p>
           <div className="flex gap-4">
             <Link href="/terms" className="text-xs text-zinc-600 hover:text-zinc-400 transition-colors">Terms & Policy</Link>
             <span>-</span>
