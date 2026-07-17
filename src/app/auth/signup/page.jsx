@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import { Button, Link } from "@heroui/react";
 import { authClient } from "@/lib/auth-client"; 
 import { useRouter } from "next/navigation";
+import {Description, Label, Radio, RadioGroup} from "@heroui/react";
 
 export default function SignUp() {
   const router = useRouter();
@@ -12,6 +13,7 @@ export default function SignUp() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [role, setRole] = useState("seeker"); // Default role is 'seeker'
 
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -44,6 +46,7 @@ export default function SignUp() {
         email,
         password,
         name,
+        role,
         callbackURL: "/", 
       }, {
         onRequest: () => setLoading(true),
@@ -167,6 +170,8 @@ export default function SignUp() {
             </div>
           </div>
 
+          
+
           {/* Confirm Password Input Field */}
           <div className="flex flex-col gap-1">
             <label className="text-zinc-400 text-xs font-medium pb-1">Confirm Password</label>
@@ -181,6 +186,32 @@ export default function SignUp() {
               <PasswordToggleIcon isVisible={showConfirmPassword} toggle={toggleConfirmPasswordVisibility} />
             </div>
           </div>
+
+          {/* Role Selection Dropdown */}
+          <div className="flex flex-col gap-4">
+      <Label>Select Role</Label>
+      <RadioGroup onChange={value => setRole(value)} defaultValue="seeker" name="role" orientation="horizontal">
+        <Radio value="seeker">
+          <Radio.Content>
+            <Radio.Control>
+              <Radio.Indicator />
+            </Radio.Control>
+            Seeker
+          </Radio.Content>
+         
+        </Radio>
+        <Radio value="Recruiter">
+          <Radio.Content>
+            <Radio.Control>
+              <Radio.Indicator />
+            </Radio.Control>
+            Recruiter
+          </Radio.Content>
+         
+        </Radio>
+        
+      </RadioGroup>
+    </div>
 
           {/* Form Submit Action Button */}
           <Button
