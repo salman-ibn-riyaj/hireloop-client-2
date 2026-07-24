@@ -1,6 +1,6 @@
 import React from 'react'
 
-const RecruiterPage = () => {
+const RecruiterDashboardPage = () => {
   return (
     <div>
       I am a Recruiter.
@@ -8,4 +8,4 @@ const RecruiterPage = () => {
   )
 }
 
-export default RecruiterPage
+export default RecruiterDashboardPage
