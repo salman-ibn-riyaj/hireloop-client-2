@@ -1,11 +1,17 @@
-import React from 'react'
+'use client'
+import { authClient } from "@/lib/auth-client"
 
-const RecruiterDashboardPage = () => {
+const RecruiterDashboardHomePage = () => {
+
+  const { data: session } = authClient.useSession();
+  const user = session?.user;
   return (
     <div>
-      I am a Recruiter.
+     
+      <p className="text-2xl px-4 py-2">Welcome, {user?.name}</p>
+       
     </div>
   )
 }
 
-export default RecruiterDashboardPage
+export default RecruiterDashboardHomePage
