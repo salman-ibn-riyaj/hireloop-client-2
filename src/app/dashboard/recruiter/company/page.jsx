@@ -1,729 +1,480 @@
-'use client';
+"use client";
 
-import React, { useState, useEffect, useRef } from 'react';
-import { useRouter } from 'next/navigation';
+import { useState } from "react";
 import {
+  Button,
   Card,
   Input,
-  Textarea,
+  TextArea,
   Select,
-  SelectItem,
-  Button,
-  Image,
-  Spinner,
+  Label,
+  ListBox,
   Chip,
-  Tooltip,
-} from '@heroui/react';
+  Modal,
+} from "@heroui/react";
 import {
-  FiBuilding,
-  FiMapPin,
-  FiUsers,
   FiBriefcase,
   FiGlobe,
-  FiUpload,
-  FiX,
-  FiEdit2,
+  FiMapPin,
+  FiUsers,
+  FiUploadCloud,
+  FiEdit,
   FiPlus,
-  FiExternalLink,
-  FiClock,
   FiCheckCircle,
+  FiClock,
   FiXCircle,
-  FiAlertCircle,
-} from 'react-icons/fi';
+} from "react-icons/fi";
 
-// Constants
-const INDUSTRIES = [
-  { value: 'Technology', label: 'Technology' },
-  { value: 'Healthcare', label: 'Healthcare' },
-  { value: 'Finance', label: 'Finance' },
-  { value: 'Education', label: 'Education' },
-  { value: 'Retail', label: 'Retail' },
-  { value: 'Manufacturing', label: 'Manufacturing' },
-  { value: 'Real Estate', label: 'Real Estate' },
-  { value: 'Media', label: 'Media & Entertainment' },
-  { value: 'Consulting', label: 'Consulting' },
-  { value: 'Nonprofit', label: 'Nonprofit' },
-  { value: 'Other', label: 'Other' },
+const INDUSTRY_OPTIONS = [
+  { key: "Technology", label: "Technology" },
+  { key: "Finance", label: "Finance & Banking" },
+  { key: "Healthcare", label: "Healthcare" },
+  { key: "E-Commerce", label: "E-Commerce" },
+  { key: "Education", label: "Education" },
 ];
 
 const EMPLOYEE_RANGES = [
-  { value: '1-10', label: '1-10 employees' },
-  { value: '11-50', label: '11-50 employees' },
-  { value: '51-200', label: '51-200 employees' },
-  { value: '201-500', label: '201-500 employees' },
-  { value: '501-1000', label: '501-1000 employees' },
-  { value: '1000+', label: '1000+ employees' },
+  { key: "1-10", label: "1-10 employees" },
+  { key: "11-50", label: "11-50 employees" },
+  { key: "51-200", label: "51-200 employees" },
+  { key: "201-500", label: "201-500 employees" },
+  { key: "500+", label: "500+ employees" },
 ];
 
-const STATUS_CONFIG = {
-  pending: {
-    icon: FiClock,
-    label: 'Pending Review',
-    className: 'bg-amber-500/10 text-amber-400 border-amber-500/20',
-  },
-  approved: {
-    icon: FiCheckCircle,
-    label: 'Approved',
-    className: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20',
-  },
-  rejected: {
-    icon: FiXCircle,
-    label: 'Rejected',
-    className: 'bg-rose-500/10 text-rose-400 border-rose-500/20',
-  },
-};
-
-// Status Badge Component
-const CompanyStatusBadge = ({ status, rejectionReason }) => {
-  const config = STATUS_CONFIG[status] || STATUS_CONFIG.pending;
-  const Icon = config.icon;
-
-  return (
-    <Tooltip
-      content={
-        <div className="px-1 py-0.5">
-          <p className="text-xs font-medium">{config.label}</p>
-          {status === 'rejected' && rejectionReason && (
-            <p className="text-xs text-rose-400 mt-1">Reason: {rejectionReason}</p>
-          )}
-        </div>
-      }
-      className="bg-zinc-800 border border-zinc-700 text-zinc-100"
-    >
-      <Chip
-        size="sm"
-        variant="flat"
-        className={config.className}
-        startContent={<Icon className="w-3.5 h-3.5" />}
-      >
-        {config.label}
-      </Chip>
-    </Tooltip>
-  );
-};
-
-// Main Component
-const RecruiterCompany = () => {
-  const router = useRouter();
-  const fileInputRef = useRef(null);
-  
-  // States
-  const [loading, setLoading] = useState(true);
-  const [submitting, setSubmitting] = useState(false);
-  const [company, setCompany] = useState(null);
+export default function RecruiterCompanyPage() {
+  const [isOpen, setIsOpen] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
-  const [error, setError] = useState(null);
-  
-  // Form states
-  const [formData, setFormData] = useState({
-    name: '',
-    industry: '',
-    website: '',
-    location: '',
-    employeeCount: '',
-    description: '',
+
+  const [company, setCompany] = useState({
+    name: "Acme Corporation",
+    website: "https://www.acme.com",
+    industry: "Technology",
+    location: "San Francisco, CA",
+    employeeCount: "11-50",
+    logo: "https://i.ibb.co/sample-logo.png",
+    description: "Building next-generation solutions for modern software teams.",
+    status: "Pending",
   });
-  const [logoPreview, setLogoPreview] = useState(null);
+
   const [logoFile, setLogoFile] = useState(null);
-  const [formErrors, setFormErrors] = useState({});
+  const [logoPreview, setLogoPreview] = useState("");
+  const [isUploading, setIsUploading] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // Mock fetch - Replace with your actual API call
-  useEffect(() => {
-    const fetchCompany = async () => {
-      try {
-        setLoading(true);
-        // Replace this with your actual API call
-        // const result = await getCompany();
-        // if (result.success) {
-        //   setCompany(result.data);
-        // }
-        
-        // Mock data - remove this in production
-        setTimeout(() => {
-          // Set to null to show empty state, or uncomment below to show company details
-          setCompany(null);
-          // setCompany({
-          //   name: 'Acme Corp',
-          //   industry: 'Technology',
-          //   website: 'https://acme.com',
-          //   location: 'San Francisco, CA',
-          //   employeeCount: '51-200',
-          //   description: 'Building the future of work with innovative solutions.',
-          //   logo: null,
-          //   status: 'pending',
-          //   createdAt: new Date().toISOString(),
-          //   updatedAt: new Date().toISOString(),
-          // });
-          setLoading(false);
-        }, 1000);
-      } catch (err) {
-        setError('Failed to load company data');
-        setLoading(false);
-      }
-    };
+  const [formData, setFormData] = useState({
+    name: "",
+    website: "",
+    industry: "",
+    location: "",
+    employeeCount: "",
+    description: "",
+  });
 
-    fetchCompany();
-  }, []);
-
-  // Handle form input changes
-  const handleChange = (field, value) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
-    if (formErrors[field]) {
-      setFormErrors(prev => ({ ...prev, [field]: undefined }));
-    }
-  };
-
-  // Handle logo upload
-  const handleFileChange = (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
-
-    const validTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
-    const maxSize = 5 * 1024 * 1024;
-
-    if (!validTypes.includes(file.type)) {
-      setFormErrors(prev => ({ ...prev, logo: 'PNG, JPG or GIF up to 5MB' }));
-      return;
-    }
-
-    if (file.size > maxSize) {
-      setFormErrors(prev => ({ ...prev, logo: 'PNG, JPG or GIF up to 5MB' }));
-      return;
-    }
-
-    setLogoFile(file);
-    setFormErrors(prev => ({ ...prev, logo: undefined }));
-    const reader = new FileReader();
-    reader.onloadend = () => setLogoPreview(reader.result);
-    reader.readAsDataURL(file);
-  };
-
-  const removeLogo = () => {
+  const handleOpenRegister = () => {
+    setIsEditing(false);
+    setFormData({
+      name: "",
+      website: "",
+      industry: "",
+      location: "",
+      employeeCount: "",
+      description: "",
+    });
+    setLogoPreview("");
     setLogoFile(null);
-    setLogoPreview(null);
-    if (fileInputRef.current) fileInputRef.current.value = '';
+    setIsOpen(true);
   };
 
-  // Validate form
-  const validateForm = () => {
-    const errors = {};
-    if (!formData.name?.trim()) errors.name = 'Company name is required';
-    if (!formData.industry) errors.industry = 'Industry is required';
-    if (!formData.location?.trim()) errors.location = 'Location is required';
-    if (!formData.employeeCount) errors.employeeCount = 'Employee count is required';
-    if (!formData.description?.trim()) errors.description = 'Description is required';
-    setFormErrors(errors);
-    return Object.keys(errors).length === 0;
+  const handleOpenEdit = () => {
+    setIsEditing(true);
+    setFormData({
+      name: company.name,
+      website: company.website,
+      industry: company.industry,
+      location: company.location,
+      employeeCount: company.employeeCount,
+      description: company.description,
+    });
+    setLogoPreview(company.logo);
+    setIsOpen(true);
   };
 
-  // Handle form submit
+  const uploadToImgBB = async (file) => {
+    const apiKey = process.env.NEXT_PUBLIC_IMGBB_API_KEY;
+    const bodyData = new FormData();
+    bodyData.append("image", file);
+
+    const res = await fetch(`https://api.imgbb.com/1/upload?key=${apiKey}`, {
+      method: "POST",
+      body: bodyData,
+    });
+
+    const data = await res.json();
+    if (!data.success) {
+      throw new Error(data.error?.message || "Image upload failed");
+    }
+
+    return data.data.url;
+  };
+
+  const handleLogoChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setLogoFile(file);
+      setLogoPreview(URL.createObjectURL(file));
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!validateForm()) return;
-
-    setSubmitting(true);
-    
-    // Prepare form data
-    const submitData = new FormData();
-    Object.keys(formData).forEach(key => {
-      if (formData[key]) submitData.append(key, formData[key]);
-    });
-    if (logoFile) submitData.append('logoFile', logoFile);
+    setIsSubmitting(true);
 
     try {
-      // Replace with your actual API call
-      // const result = await saveCompany(submitData);
-      // if (result.success) {
-      //   setCompany(result.data);
-      //   setIsEditing(false);
-      //   router.refresh();
-      // }
-      
-      // Mock success
-      console.log('Submitting:', Object.fromEntries(submitData));
-      setTimeout(() => {
-        setCompany({
-          ...formData,
-          logo: logoPreview,
-          status: 'pending',
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString(),
-        });
-        setIsEditing(false);
-        setSubmitting(false);
-      }, 1000);
-    } catch (error) {
-      setFormErrors({ general: 'Failed to save company' });
-      setSubmitting(false);
+      let finalLogoUrl = company?.logo || "";
+
+      if (logoFile) {
+        setIsUploading(true);
+        finalLogoUrl = await uploadToImgBB(logoFile);
+        setIsUploading(false);
+      }
+
+      const updatedCompanyData = {
+        ...formData,
+        logo: finalLogoUrl,
+        status: isEditing ? company.status : "Pending",
+      };
+
+      setCompany(updatedCompanyData);
+      setIsOpen(false);
+    } catch (err) {
+      console.error("Error submitting company info:", err);
+    } finally {
+      setIsSubmitting(false);
+      setIsUploading(false);
+      console.log("Form Data Submitted:", { ...formData, logo: logoFile });
     }
   };
 
-  // Handle edit
-  const handleEdit = () => {
-    if (company) {
-      setFormData({
-        name: company.name || '',
-        industry: company.industry || '',
-        website: company.website || '',
-        location: company.location || '',
-        employeeCount: company.employeeCount || '',
-        description: company.description || '',
-      });
-      setLogoPreview(company.logo || null);
-    }
-    setIsEditing(true);
-  };
-
-  // Handle cancel
-  const handleCancel = () => {
-    setIsEditing(false);
-    setFormErrors({});
-    if (company) {
-      setFormData({
-        name: company.name || '',
-        industry: company.industry || '',
-        website: company.website || '',
-        location: company.location || '',
-        employeeCount: company.employeeCount || '',
-        description: company.description || '',
-      });
-      setLogoPreview(company.logo || null);
+  const renderStatusBadge = (status) => {
+    switch (status) {
+      case "Approved":
+        return (
+          <Chip color="success" variant="flat" startContent={<FiCheckCircle />}>
+            Approved
+          </Chip>
+        );
+      case "Rejected":
+        return (
+          <Chip color="danger" variant="flat" startContent={<FiXCircle />}>
+            Rejected
+          </Chip>
+        );
+      default:
+        return (
+          <Chip color="warning" variant="flat" startcontent={<FiClock />}>
+            Pending Approval
+          </Chip>
+        );
     }
   };
 
-  // Loading state
-  if (loading) {
-    return (
-      <div className="max-w-4xl mx-auto p-6">
-        <div className="animate-pulse space-y-6">
-          <div className="h-8 w-48 bg-zinc-800 rounded" />
-          <div className="h-64 bg-zinc-800/50 rounded-xl" />
-        </div>
+  return (
+    <div className="max-w-5xl mx-auto px-4 sm:px-6 py-6 text-zinc-100">
+      {/* HEADER SECTION */}
+      <div className="flex flex-col xs:flex-row sm:flex-row justify-between items-start xs:items-center sm:items-center gap-4 mb-6">
+        <h1 className="text-xl sm:text-2xl font-bold">Company Profile</h1>
+        {company && (
+          <Button
+            color="primary"
+            variant="solid"
+            startContent={<FiEdit />}
+            onPress={handleOpenEdit}
+            className="w-full xs:w-auto bg-blue-600 hover:bg-blue-500 text-white font-semibold shadow-lg shadow-blue-500/20 ring-2 ring-blue-400/30 transition-all duration-200"
+          >
+            Edit Company
+          </Button>
+        )}
       </div>
-    );
-  }
 
-  // Error state
-  if (error) {
-    return (
-      <div className="max-w-4xl mx-auto p-6">
-        <Card className="bg-zinc-900/50 border border-zinc-800">
-          <div className="p-6 py-12 text-center">
-            <FiAlertCircle className="w-12 h-12 text-rose-500 mx-auto mb-4" />
-            <h3 className="text-lg font-semibold text-zinc-100 mb-2">Something went wrong</h3>
-            <p className="text-sm text-zinc-400">{error}</p>
-          </div>
-        </Card>
-      </div>
-    );
-  }
-
-  // ============================================
-  // EMPTY STATE - No Company Registered
-  // ============================================
-  if (!company && !isEditing) {
-    return (
-      <div className="max-w-4xl mx-auto p-6">
-        <Card className="bg-zinc-900/60 border border-zinc-800 shadow-xl">
-          <div className="p-6 py-16 text-center">
-            <div className="w-20 h-20 mx-auto mb-6 rounded-2xl bg-zinc-800 border border-zinc-700 flex items-center justify-center">
-              <FiBuilding className="w-10 h-10 text-zinc-500" />
+      {/* UNREGISTERED STATE */}
+      {!company ? (
+        <Card className="bg-zinc-900 border border-zinc-800 p-6 sm:p-10 text-center">
+          <Card.Header className="flex flex-col items-center gap-4">
+            <div className="p-3 sm:p-4 bg-zinc-800/60 rounded-full text-zinc-400">
+              <FiBriefcase className="w-8 h-8 sm:w-12 sm:h-12" />
             </div>
-            
-            <h3 className="text-xl font-semibold text-zinc-100 mb-2">
+            <Card.Title className="text-lg sm:text-xl font-semibold text-white">
               No Company Registered
-            </h3>
-            
-            <p className="text-sm text-zinc-400 max-w-md mx-auto mb-8">
-              Get started by registering your company. This information will be 
-              displayed to job seekers when you post job openings.
-            </p>
-
+            </Card.Title>
+            <Card.Description className="text-sm sm:text-base text-zinc-400 max-w-md">
+              You haven't set up a company profile yet. Register your company to start posting job listings and managing applicants.
+            </Card.Description>
             <Button
-              onPress={() => setIsEditing(true)}
-              startContent={<FiPlus className="w-4 h-4" />}
-              className="bg-white hover:bg-zinc-200 text-zinc-950 font-semibold"
+              color="primary"
+              size="lg"
+              startContent={<FiPlus />}
+              onPress={handleOpenRegister}
+              className="w-full sm:w-auto font-medium mt-2"
             >
               Register Company
             </Button>
-          </div>
+          </Card.Header>
         </Card>
-      </div>
-    );
-  }
-
-  // ============================================
-  // EDIT MODE - Register/Edit Form
-  // ============================================
-  if (isEditing) {
-    return (
-      <div className="max-w-2xl mx-auto p-6">
-        <div className="mb-8">
-          <h1 className="text-2xl font-bold text-zinc-100">
-            {company ? 'Edit Company' : 'Register New Company'}
-          </h1>
-          <p className="text-sm text-zinc-400 mt-1">
-            {company 
-              ? 'Update your company information' 
-              : 'Enter your business details to start hiring on HireLoop.'}
-          </p>
-        </div>
-
-        <Card className="bg-zinc-900/60 border border-zinc-800 shadow-xl">
-          <div className="p-6">
-            <form onSubmit={handleSubmit} className="space-y-5">
-              {/* Company Name */}
-              <div>
-                <label className="text-sm font-medium text-zinc-300 block mb-1.5">
-                  Company Name
-                </label>
-                <Input
-                  placeholder="e.g. Acme Corp"
-                  value={formData.name}
-                  onChange={(e) => handleChange('name', e.target.value)}
-                  isInvalid={!!formErrors.name}
-                  errorMessage={formErrors.name}
-                  variant="bordered"
-                  classNames={{
-                    input: 'text-zinc-100',
-                    inputWrapper: 'bg-zinc-900/50 border-zinc-700 hover:border-zinc-600',
-                  }}
-                />
-              </div>
-
-              {/* Industry */}
-              <div>
-                <label className="text-sm font-medium text-zinc-300 block mb-1.5">
-                  Industry / Category
-                </label>
-                <Select
-                  placeholder="Select industry"
-                  selectedKeys={formData.industry ? [formData.industry] : []}
-                  onChange={(e) => handleChange('industry', e.target.value)}
-                  isInvalid={!!formErrors.industry}
-                  errorMessage={formErrors.industry}
-                  variant="bordered"
-                  classNames={{
-                    trigger: 'bg-zinc-900/50 border-zinc-700 hover:border-zinc-600',
-                    value: 'text-zinc-100',
-                    popover: 'bg-zinc-900 border border-zinc-800',
-                  }}
-                >
-                  {INDUSTRIES.map((ind) => (
-                    <SelectItem key={ind.value} value={ind.value} className="hover:bg-zinc-800 rounded-lg">
-                      {ind.label}
-                    </SelectItem>
-                  ))}
-                </Select>
-              </div>
-
-              {/* Website */}
-              <div>
-                <label className="text-sm font-medium text-zinc-300 block mb-1.5">
-                  Website URL
-                </label>
-                <Input
-                  placeholder="https://www.company.com"
-                  value={formData.website}
-                  onChange={(e) => handleChange('website', e.target.value)}
-                  variant="bordered"
-                  classNames={{
-                    input: 'text-zinc-100',
-                    inputWrapper: 'bg-zinc-900/50 border-zinc-700 hover:border-zinc-600',
-                  }}
-                  startContent={<FiGlobe className="w-4 h-4 text-zinc-500" />}
-                />
-              </div>
-
-              {/* Location */}
-              <div>
-                <label className="text-sm font-medium text-zinc-300 block mb-1.5">
-                  Location
-                </label>
-                <Input
-                  placeholder="City, Country"
-                  value={formData.location}
-                  onChange={(e) => handleChange('location', e.target.value)}
-                  isInvalid={!!formErrors.location}
-                  errorMessage={formErrors.location}
-                  variant="bordered"
-                  classNames={{
-                    input: 'text-zinc-100',
-                    inputWrapper: 'bg-zinc-900/50 border-zinc-700 hover:border-zinc-600',
-                  }}
-                  startContent={<FiMapPin className="w-4 h-4 text-zinc-500" />}
-                />
-              </div>
-
-              {/* Employee Count */}
-              <div>
-                <label className="text-sm font-medium text-zinc-300 block mb-1.5">
-                  Employee Count Range
-                </label>
-                <Select
-                  placeholder="Select employee count"
-                  selectedKeys={formData.employeeCount ? [formData.employeeCount] : []}
-                  onChange={(e) => handleChange('employeeCount', e.target.value)}
-                  isInvalid={!!formErrors.employeeCount}
-                  errorMessage={formErrors.employeeCount}
-                  variant="bordered"
-                  classNames={{
-                    trigger: 'bg-zinc-900/50 border-zinc-700 hover:border-zinc-600',
-                    value: 'text-zinc-100',
-                    popover: 'bg-zinc-900 border border-zinc-800',
-                  }}
-                  startContent={<FiUsers className="w-4 h-4 text-zinc-500" />}
-                >
-                  {EMPLOYEE_RANGES.map((range) => (
-                    <SelectItem key={range.value} value={range.value} className="hover:bg-zinc-800 rounded-lg">
-                      {range.label}
-                    </SelectItem>
-                  ))}
-                </Select>
-              </div>
-
-              {/* Logo */}
-              <div>
-                <label className="text-sm font-medium text-zinc-300 block mb-1.5">
-                  Company Logo
-                </label>
-                <div className="flex items-center gap-4">
-                  {logoPreview ? (
-                    <div className="relative">
-                      <Image
-                        src={logoPreview}
-                        alt="Logo preview"
-                        className="w-16 h-16 object-contain rounded-lg border border-zinc-700 bg-zinc-900"
-                      />
-                      <button
-                        type="button"
-                        onClick={removeLogo}
-                        className="absolute -top-1.5 -right-1.5 p-1 bg-rose-500 rounded-full hover:bg-rose-600 transition-colors"
-                      >
-                        <FiX className="w-3 h-3 text-white" />
-                      </button>
-                    </div>
-                  ) : (
-                    <div className="w-16 h-16 rounded-lg border-2 border-dashed border-zinc-700 bg-zinc-900/50 flex items-center justify-center">
-                      <FiBuilding className="w-6 h-6 text-zinc-600" />
-                    </div>
-                  )}
-                  <div>
-                    <input
-                      ref={fileInputRef}
-                      type="file"
-                      accept="image/jpeg,image/png,image/gif,image/webp"
-                      onChange={handleFileChange}
-                      className="hidden"
-                    />
-                    <Button
-                      type="button"
-                      variant="bordered"
-                      onPress={() => fileInputRef.current?.click()}
-                      className="bg-zinc-900/50 border-zinc-700 text-zinc-300"
-                      startContent={<FiUpload className="w-4 h-4" />}
-                    >
-                      Upload image
-                    </Button>
-                    <p className="text-xs text-zinc-500 mt-1">PNG, JPG up to 5MB</p>
-                    {formErrors.logo && (
-                      <p className="text-xs text-rose-400 mt-1">{formErrors.logo}</p>
-                    )}
-                  </div>
+      ) : (
+        /* REGISTERED STATE */
+        <Card className="bg-zinc-900 border border-zinc-800">
+          <Card.Header className="flex flex-col sm:flex-row justify-between items-start sm:items-center p-4 sm:p-6 gap-4 border-b border-zinc-800">
+            <div className="flex items-center gap-3 sm:gap-4 min-w-0 w-full sm:w-auto">
+              <img
+                src={company.logo || "/placeholder-company.png"}
+                alt={company.name}
+                className="w-12 h-12 sm:w-16 sm:h-16 rounded-lg object-cover bg-zinc-800 border border-zinc-700 shrink-0"
+              />
+              <div className="min-w-0 flex-1">
+                <Card.Title className="text-xl sm:text-2xl font-bold text-white truncate">
+                  {company.name}
+                </Card.Title>
+                <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs sm:text-sm text-zinc-400 mt-1">
+                  <span className="flex items-center gap-1">
+                    <FiBriefcase className="shrink-0" /> {company.industry}
+                  </span>
+                  <span className="flex items-center gap-1">
+                    <FiMapPin className="shrink-0" /> {company.location}
+                  </span>
                 </div>
               </div>
-
-              {/* Description */}
-              <div>
-                <label className="text-sm font-medium text-zinc-300 block mb-1.5">
-                  Brief Description
-                </label>
-                <Textarea
-                  placeholder="Tell us about your company's mission and culture..."
-                  value={formData.description}
-                  onChange={(e) => handleChange('description', e.target.value)}
-                  isInvalid={!!formErrors.description}
-                  errorMessage={formErrors.description}
-                  minRows={3}
-                  maxRows={6}
-                  variant="bordered"
-                  classNames={{
-                    input: 'text-zinc-100',
-                    inputWrapper: 'bg-zinc-900/50 border-zinc-700 hover:border-zinc-600',
-                  }}
-                />
-              </div>
-
-              {/* General Error */}
-              {formErrors.general && (
-                <div className="p-3 bg-rose-500/10 border border-rose-500/20 rounded-lg">
-                  <p className="text-xs text-rose-400">{formErrors.general}</p>
-                </div>
-              )}
-
-              {/* Buttons */}
-              <div className="flex gap-3 pt-4 border-t border-zinc-800/80">
-                <Button
-                  type="button"
-                  variant="flat"
-                  onPress={handleCancel}
-                  className="flex-1 bg-zinc-800/50 hover:bg-zinc-800 text-zinc-300"
-                >
-                  Cancel
-                </Button>
-                <Button
-                  type="submit"
-                  isLoading={submitting}
-                  spinner={<Spinner size="sm" color="white" />}
-                  className="flex-[2] bg-white hover:bg-zinc-200 text-zinc-950 font-semibold"
-                >
-                  {submitting ? 'Saving...' : company ? 'Update Company' : 'Register Company'}
-                </Button>
-              </div>
-            </form>
-          </div>
-        </Card>
-      </div>
-    );
-  }
-
-  // ============================================
-  // VIEW MODE - Show Company Details
-  // ============================================
-  return (
-    <div className="max-w-4xl mx-auto p-6">
-      <div className="flex justify-between items-center mb-6">
-        <div>
-          <h1 className="text-2xl font-bold text-zinc-100">My Company</h1>
-          <p className="text-sm text-zinc-400 mt-1">View and manage your company profile</p>
-        </div>
-        <Button
-          onPress={handleEdit}
-          startContent={<FiEdit2 className="w-4 h-4" />}
-          className="bg-zinc-800 hover:bg-zinc-700 text-zinc-100"
-        >
-          Edit Company
-        </Button>
-      </div>
-
-      <Card className="bg-zinc-900/60 border border-zinc-800 shadow-xl">
-        <div className="p-6 md:p-8">
-          {/* Header with Logo */}
-          <div className="flex flex-col md:flex-row gap-6">
-            {/* Logo */}
-            <div className="flex-shrink-0">
-              {company.logo ? (
-                <Image
-                  src={company.logo}
-                  alt={company.name}
-                  className="w-24 h-24 md:w-32 md:h-32 object-contain rounded-xl border border-zinc-700 bg-zinc-900"
-                />
-              ) : (
-                <div className="w-24 h-24 md:w-32 md:h-32 rounded-xl bg-gradient-to-br from-zinc-800 to-zinc-900 border border-zinc-700 flex items-center justify-center">
-                  <FiBuilding className="w-12 h-12 text-zinc-600" />
-                </div>
-              )}
             </div>
+            <div className="self-start sm:self-auto shrink-0">
+              {renderStatusBadge(company.status)}
+            </div>
+          </Card.Header>
 
-            {/* Company Info */}
-            <div className="flex-1 min-w-0">
-              <div className="flex flex-col md:flex-row md:items-start justify-between gap-3">
+          <Card.Header className="p-4 sm:p-6 space-y-6 flex flex-col items-stretch border-none">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+              <div className="flex items-center gap-3 p-3 bg-zinc-800/40 rounded-lg border border-zinc-800 min-w-0">
+                <FiGlobe className="text-zinc-400 shrink-0" />
+                <div className="min-w-0">
+                  <p className="text-xs text-zinc-500">Website</p>
+                  <a
+                    href={company.website}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="text-xs sm:text-sm text-blue-400 hover:underline truncate block"
+                  >
+                    {company.website}
+                  </a>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-3 p-3 bg-zinc-800/40 rounded-lg border border-zinc-800">
+                <FiUsers className="text-zinc-400 shrink-0" />
                 <div>
-                  <h2 className="text-2xl font-bold text-zinc-100 truncate">
-                    {company.name}
-                  </h2>
-                  <div className="flex flex-wrap items-center gap-2 mt-2">
-                    <Chip
-                      size="sm"
-                      variant="flat"
-                      className="bg-zinc-800 text-zinc-300 border-zinc-700"
-                      startContent={<FiBriefcase className="w-3 h-3" />}
-                    >
-                      {company.industry}
-                    </Chip>
-                    <Chip
-                      size="sm"
-                      variant="flat"
-                      className="bg-zinc-800 text-zinc-300 border-zinc-700"
-                      startContent={<FiUsers className="w-3 h-3" />}
-                    >
-                      {company.employeeCount}
-                    </Chip>
-                    <Chip
-                      size="sm"
-                      variant="flat"
-                      className="bg-zinc-800 text-zinc-300 border-zinc-700"
-                      startContent={<FiMapPin className="w-3 h-3" />}
-                    >
-                      {company.location}
-                    </Chip>
-                  </div>
+                  <p className="text-xs text-zinc-500">Company Size</p>
+                  <p className="text-xs sm:text-sm font-medium">{company.employeeCount} employees</p>
                 </div>
-                <CompanyStatusBadge status={company.status} rejectionReason={company.rejectionReason} />
               </div>
             </div>
-          </div>
-
-          <hr className="border-zinc-800/80 my-6" />
-
-          {/* Company Details */}
-          <div className="space-y-4">
-            {company.website && (
-              <div>
-                <p className="text-xs font-medium text-zinc-400 uppercase tracking-wider flex items-center gap-2">
-                  <FiGlobe className="w-3.5 h-3.5" />
-                  Website
-                </p>
-                <a
-                  href={company.website.startsWith('http') ? company.website : `https://${company.website}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-sm text-emerald-400 hover:text-emerald-300 hover:underline inline-flex items-center gap-1 mt-1"
-                >
-                  {company.website}
-                  <FiExternalLink className="w-3 h-3" />
-                </a>
-              </div>
-            )}
 
             <div>
-              <p className="text-xs font-medium text-zinc-400 uppercase tracking-wider flex items-center gap-2">
-                <FiBriefcase className="w-3.5 h-3.5" />
-                About
-              </p>
-              <p className="text-sm text-zinc-300 leading-relaxed whitespace-pre-wrap mt-1">
+              <h3 className="text-xs sm:text-sm font-semibold text-zinc-400 uppercase tracking-wider mb-2">
+                About the Company
+              </h3>
+              <p className="text-xs sm:text-sm text-zinc-300 leading-relaxed break-words">
                 {company.description}
               </p>
             </div>
-          </div>
+          </Card.Header>
+        </Card>
+      )}
 
-          <hr className="border-zinc-800/80 my-6" />
+      {/* RESPONSIVE MODAL */}
+      <Modal isOpen={isOpen} onOpenChange={setIsOpen}>
+        <Modal.Backdrop className="p-2 sm:p-4 flex items-center justify-center">
+          <Modal.Container className="w-full flex items-center justify-center">
+            <Modal.Dialog className="w-full max-w-2xl max-h-[90vh] flex flex-col bg-zinc-900 border border-zinc-800 text-zinc-100 rounded-xl shadow-2xl overflow-hidden my-auto">
+              <Modal.CloseTrigger />
+              <form onSubmit={handleSubmit} className="flex flex-col max-h-[90vh] overflow-hidden">
+                {/* Modal Header */}
+                <Modal.Header className="flex flex-col gap-1 border-b border-zinc-800 p-4 sm:p-6 shrink-0">
+                  <Modal.Heading className="text-base sm:text-lg font-semibold text-white">
+                    {isEditing ? "Edit Company Details" : "Register New Company"}
+                  </Modal.Heading>
+                  <p className="text-xs font-normal text-zinc-400">
+                    Enter your business details to start hiring on HireLoop.
+                  </p>
+                </Modal.Header>
 
-          {/* Metadata */}
-          <div className="flex flex-wrap gap-6 text-xs text-zinc-500">
-            <div>
-              <span className="font-medium">Created:</span>{' '}
-              {new Date(company.createdAt).toLocaleDateString('en-US', {
-                year: 'numeric',
-                month: 'long',
-                day: 'numeric',
-              })}
-            </div>
-            {company.updatedAt && (
-              <div>
-                <span className="font-medium">Last Updated:</span>{' '}
-                {new Date(company.updatedAt).toLocaleDateString('en-US', {
-                  year: 'numeric',
-                  month: 'long',
-                  day: 'numeric',
-                })}
-              </div>
-            )}
-          </div>
-        </div>
-      </Card>
+                {/* Modal Body with Vertical Scroll for Small Viewports */}
+                <Modal.Body className="gap-4 p-4 sm:p-6 overflow-y-auto max-h-[60vh] sm:max-h-[65vh] grow">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+                    {/* Company Name */}
+                    <div className="flex flex-col gap-1.5">
+                      <Label className="text-xs font-medium text-zinc-300">Company Name</Label>
+                      <Input
+                        placeholder="e.g. Acme Corp"
+                        value={formData.name}
+                        onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                        className="bg-zinc-800/50 border border-zinc-700 hover:border-zinc-600 focus:border-zinc-500 rounded-lg px-3 py-2 text-sm w-full"
+                        required
+                      />
+                    </div>
+
+                    {/* Industry */}
+                    <div className="flex flex-col gap-1.5">
+                      <Select className="w-full" placeholder="Select Industry">
+                        <Label className="text-xs font-medium text-zinc-300">Industry / Category</Label>
+                        <Select.Trigger className="w-full bg-zinc-800/50 border border-zinc-700 hover:border-zinc-600 focus:border-zinc-500 rounded-lg px-3 py-2 flex items-center justify-between text-sm">
+                          <Select.Value />
+                          <Select.Indicator />
+                        </Select.Trigger>
+                        <Select.Popover className="bg-zinc-900 border border-zinc-800 rounded-lg p-1 shadow-xl z-50 max-h-48 overflow-y-auto">
+                          <ListBox
+                            aria-label="Select Industry"
+                            selectedKeys={formData.industry ? [formData.industry] : []}
+                            onSelectionChange={(keys) => {
+                              const key = Array.from(keys)[0];
+                              setFormData({ ...formData, industry: String(key || "") });
+                            }}
+                          >
+                            {INDUSTRY_OPTIONS.map((item) => (
+                              <ListBox.Item
+                                key={item.key}
+                                id={item.key}
+                                textValue={item.label}
+                                className="p-2 text-sm rounded hover:bg-zinc-800 cursor-pointer flex items-center justify-between text-zinc-200"
+                              >
+                                {item.label}
+                                <ListBox.ItemIndicator />
+                              </ListBox.Item>
+                            ))}
+                          </ListBox>
+                        </Select.Popover>
+                      </Select>
+                    </div>
+
+                    {/* Website URL */}
+                    <div className="flex flex-col gap-1.5">
+                      <Label className="text-xs font-medium text-zinc-300">Website URL</Label>
+                      <div className="flex items-center bg-zinc-800/50 border border-zinc-700 hover:border-zinc-600 focus-within:border-zinc-500 rounded-lg px-3 py-2">
+                        <span className="text-zinc-500 text-sm mr-1 shrink-0">https://</span>
+                        <Input
+                          placeholder="www.company.com"
+                          value={formData.website.replace(/^https?:\/\//, "")}
+                          onChange={(e) => setFormData({ ...formData, website: `https://${e.target.value}` })}
+                          className="bg-transparent border-none p-0 text-sm focus:outline-none w-full min-w-0"
+                        />
+                      </div>
+                    </div>
+
+                    {/* Location */}
+                    <div className="flex flex-col gap-1.5">
+                      <Label className="text-xs font-medium text-zinc-300">Location</Label>
+                      <div className="flex items-center gap-2 bg-zinc-800/50 border border-zinc-700 hover:border-zinc-600 focus-within:border-zinc-500 rounded-lg px-3 py-2">
+                        <FiMapPin className="text-zinc-500 shrink-0" />
+                        <Input
+                          placeholder="City, Country"
+                          value={formData.location}
+                          onChange={(e) => setFormData({ ...formData, location: e.target.value })}
+                          className="bg-transparent border-none p-0 text-sm focus:outline-none w-full min-w-0"
+                        />
+                      </div>
+                    </div>
+
+                    {/* Employee Count */}
+                    <div className="flex flex-col gap-1.5">
+                      <Select className="w-full" placeholder="Select Size">
+                        <Label className="text-xs font-medium text-zinc-300">Employee Count Range</Label>
+                        <Select.Trigger className="w-full bg-zinc-800/50 border border-zinc-700 hover:border-zinc-600 focus:border-zinc-500 rounded-lg px-3 py-2 flex items-center justify-between text-sm">
+                          <Select.Value />
+                          <Select.Indicator />
+                        </Select.Trigger>
+                        <Select.Popover className="bg-zinc-900 border border-zinc-800 rounded-lg p-1 shadow-xl z-50 max-h-48 overflow-y-auto">
+                          <ListBox
+                            aria-label="Employee Count Range"
+                            selectedKeys={formData.employeeCount ? [formData.employeeCount] : []}
+                            onSelectionChange={(keys) => {
+                              const key = Array.from(keys)[0];
+                              setFormData({ ...formData, employeeCount: String(key || "") });
+                            }}
+                          >
+                            {EMPLOYEE_RANGES.map((item) => (
+                              <ListBox.Item
+                                key={item.key}
+                                id={item.key}
+                                textValue={item.label}
+                                className="p-2 text-sm rounded hover:bg-zinc-800 cursor-pointer flex items-center justify-between text-zinc-200"
+                              >
+                                {item.label}
+                                <ListBox.ItemIndicator />
+                              </ListBox.Item>
+                            ))}
+                          </ListBox>
+                        </Select.Popover>
+                      </Select>
+                    </div>
+
+                    {/* Company Logo Upload */}
+                    <div className="flex flex-col gap-1.5">
+                      <Label className="text-xs font-medium text-zinc-300">Company Logo</Label>
+                      <label className="flex items-center gap-3 p-2.5 bg-zinc-800/50 border border-dashed border-zinc-700 rounded-lg cursor-pointer hover:border-zinc-500 transition-colors">
+                        {logoPreview ? (
+                          <img src={logoPreview} alt="Logo preview" className="w-10 h-10 rounded object-cover shrink-0" />
+                        ) : (
+                          <div className="p-2 bg-zinc-800 rounded text-zinc-400 shrink-0">
+                            <FiUploadCloud size={18} />
+                          </div>
+                        )}
+                        <div className="text-xs min-w-0">
+                          <p className="font-medium text-zinc-200 truncate">
+                            {logoFile ? logoFile.name : "Upload image"}
+                          </p>
+                          <p className="text-zinc-500">PNG, JPG up to 5MB</p>
+                        </div>
+                        <input
+                          type="file"
+                          accept="image/*"
+                          onChange={handleLogoChange}
+                          className="hidden"
+                        />
+                      </label>
+                    </div>
+                  </div>
+
+                  {/* Brief Description */}
+                  <div className="flex flex-col gap-1.5 mt-2">
+                    <Label className="text-xs font-medium text-zinc-300">Brief Description</Label>
+                    <TextArea
+                      placeholder="Tell us about your company's mission and culture..."
+                      value={formData.description}
+                      onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                      className="bg-zinc-800/50 border border-zinc-700 hover:border-zinc-600 focus:border-zinc-500 rounded-lg px-3 py-2 text-sm w-full min-h-[90px]"
+                    />
+                  </div>
+                </Modal.Body>
+
+                {/* Modal Footer */}
+                <Modal.Footer className="border-t border-zinc-800 p-4 sm:p-6 flex flex-col-reverse sm:flex-row justify-end gap-2 sm:gap-3 shrink-0">
+                  <Button
+                    variant="flat"
+                    onPress={() => setIsOpen(false)}
+                    className="w-full sm:w-auto bg-zinc-800 text-zinc-300 hover:bg-zinc-700"
+                  >
+                    Cancel
+                  </Button>
+                  <Button
+                    color="primary"
+                    type="submit"
+                    isLoading={isSubmitting || isUploading}
+                    className="w-full sm:w-auto bg-white text-black font-semibold hover:bg-zinc-200"
+                  >
+                    {isEditing ? "Save Changes" : "Register Company"}
+                  </Button>
+                </Modal.Footer>
+              </form>
+            </Modal.Dialog>
+          </Modal.Container>
+        </Modal.Backdrop>
+      </Modal>
     </div>
   );
-};
-
-export default RecruiterCompany;
+}
