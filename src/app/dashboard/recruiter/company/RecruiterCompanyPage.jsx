@@ -43,20 +43,11 @@ const EMPLOYEE_RANGES = [
   { key: "500+", label: "500+ employees" },
 ];
 
-export default function RecruiterCompanyPage({recruiter}) {
+export default function RecruiterCompanyPage({recruiter, recruiterCompany}) {
   const [isOpen, setIsOpen] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
 
-  const [company, setCompany] = useState({
-    name: "Acme Corporation",
-    website: "https://www.acme.com",
-    industry: "Technology",
-    location: "San Francisco, CA",
-    employeeCount: "11-50",
-    logo: "https://i.ibb.co/sample-logo.png",
-    description: "Building next-generation solutions for modern software teams.",
-    status: "Pending",
-  });
+  const [company, setCompany] = useState(recruiterCompany);
 
   const [logoFile, setLogoFile] = useState(null);
   const [logoPreview, setLogoPreview] = useState("");
