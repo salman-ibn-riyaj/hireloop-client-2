@@ -24,17 +24,9 @@ import {
 import { FaBuilding } from "react-icons/fa";
 import { createJob } from "@/lib/actions/jobs";
 
-export default function PostJobForm({company}) {
-  console.log("company ashce kina", company);
+export default function PostJobForm({ company }) {
+  console.log("company data:", company);
   const router = useRouter();
-
-  const companyInfo = {
-    name: "Acme Corp",
-    isApproved: true,
-    plan: "Growth",
-    currentJobsCount: 4,
-    jobLimit: 10,
-  };
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [formData, setFormData] = useState({
@@ -52,40 +44,91 @@ export default function PostJobForm({company}) {
     benefits: "",
   });
 
-  const isLimitReached = companyInfo.currentJobsCount >= companyInfo.jobLimit;
-  const canPost = companyInfo.isApproved && !isLimitReached;
+  if (!company) {
+    return (
+      <div className="min-h-screen bg-zinc-950 text-zinc-400 p-8 flex justify-center items-center text-sm">
+        Loading company details...
+      </div>
+    );
+  }
 
-  // Safe handler supporting DOM events, direct booleans, and values
+  const isLimitReached = company.currentJobsCount >= company.jobLimit;
+
+  // Safe input handler for standard inputs, checkboxes, and HeroUI component events
   const handleChange = (field, valOrEvent) => {
     let value = valOrEvent;
-    if (valOrEvent && typeof valOrEvent === "object" && "target" in valOrEvent) {
-      value =
-        valOrEvent.target.type === "checkbox"
-          ? valOrEvent.target.checked
-          : valOrEvent.target.value;
+
+    if (valOrEvent && typeof valOrEvent === "object") {
+      if ("target" in valOrEvent) {
+        value =
+          valOrEvent.target.type === "checkbox"
+            ? valOrEvent.target.checked
+            : valOrEvent.target.value;
+      } else if ("currentKey" in valOrEvent) {
+        value = valOrEvent.currentKey;
+      }
     }
+
     setFormData((prev) => ({ ...prev, [field]: value }));
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!canPost) return;
+    
+    console.log("📨 Form submit triggered");
+    console.log("Jobs count:", company?.currentJobsCount, "Limit:", company?.jobLimit);
+
+    // ✅ Validation 1: Required Fields
+    if (!formData.title.trim()) {
+      toast.error("❌ Job title required");
+      return;
+    }
+
+    if (!formData.responsibilities.trim()) {
+      toast.error("❌ Responsibilities required");
+      return;
+    }
+
+    if (!formData.requirements.trim()) {
+      toast.error("❌ Requirements required");
+      return;
+    }
+
+    if (!formData.deadline) {
+      toast.error("❌ Application deadline required");
+      return;
+    }
+
+    if (!formData.isRemote && !formData.location.trim()) {
+      toast.error("❌ Location required (or mark as remote)");
+      return;
+    }
 
     setIsSubmitting(true);
 
     try {
+      // Clean payload attaching all job state & company properties
       const payload = {
         ...formData,
-        companyId: companyInfo.name,
+        salaryMin: formData.salaryMin ? Number(formData.salaryMin) : null,
+        salaryMax: formData.salaryMax ? Number(formData.salaryMax) : null,
+        companyId: company._id || company.id,
+        companyName: company.name,
+        companyLogo: company.logo || "",
         status: "active",
         isPublic: true,
-        createdAt: new Date().toISOString(),
       };
+
+      console.log("📤 Sending payload:", payload);
 
       const res = await createJob(payload);
 
-      if (res?.insertedId || res?.acknowledged) {
-        // Styled Custom Dark-Theme Toast
+      console.log("📥 Server response:", res);
+      console.log("Response type:", typeof res);
+      console.log("Response keys:", res ? Object.keys(res) : "null");
+
+      // ✅ Check for success
+      if (res?.success || res?.insertedId || res?.acknowledged) {
         toast.custom(
           (t) => (
             <div
@@ -98,13 +141,14 @@ export default function PostJobForm({company}) {
               </div>
               <div className="flex-1 min-w-0">
                 <p className="text-xs font-semibold text-white tracking-tight">
-                  Job Published Successfully!
+                  Job Published Successfully! ✅
                 </p>
                 <p className="text-[11px] text-zinc-400 mt-0.5 truncate">
                   Your listing is live and visible to job seekers.
                 </p>
               </div>
               <button
+                type="button"
                 onClick={() => toast.dismiss(t.id)}
                 className="text-zinc-500 hover:text-zinc-300 transition-colors p-1"
               >
@@ -115,14 +159,16 @@ export default function PostJobForm({company}) {
           { duration: 4000 }
         );
 
-        e.target.reset();
-        router.push("/dashboard/recruiter/jobs");
+        setTimeout(() => {
+          router.push("/dashboard/recruiter/jobs");
+        }, 1000);
       } else {
-        toast.error("Failed to post job. Please try again.");
+        console.error("❌ Response validation failed:", res);
+        toast.error(res?.error || res?.message || "Failed to post job. Please try again.");
       }
     } catch (error) {
-      console.error("Error posting job:", error);
-      toast.error("An unexpected error occurred.");
+      console.error("🔥 Error posting job:", error);
+      toast.error(error.message || "An unexpected error occurred.");
     } finally {
       setIsSubmitting(false);
     }
@@ -157,24 +203,15 @@ export default function PostJobForm({company}) {
           <div className="flex items-center gap-2">
             <FaBuilding className="w-3.5 h-3.5 text-zinc-400" />
             <span className="text-zinc-400">Posting as:</span>
-            <span className="font-medium text-zinc-200">{companyInfo.name}</span>
-            {companyInfo.isApproved && (
-              <Chip
-                color="success"
-                className="h-5 text-[10px] bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-2 flex items-center gap-1 rounded-full"
-              >
-                <FiCheckCircle className="w-3 h-3 inline mr-1" />
-                Approved
-              </Chip>
-            )}
+            <span className="font-medium text-zinc-200">{company.name}</span>
           </div>
           <div className="flex items-center gap-2 text-zinc-400">
             <span>
               Active Limit:{" "}
-              <strong className="text-zinc-200">
-                {companyInfo.currentJobsCount}/{companyInfo.jobLimit}
+              <strong className={isLimitReached ? "text-red-400" : "text-zinc-200"}>
+                {company.currentJobsCount}/{company.jobLimit}
               </strong>{" "}
-              ({companyInfo.plan} Plan)
+              ({company.plan} Plan)
             </span>
           </div>
         </div>
@@ -191,7 +228,7 @@ export default function PostJobForm({company}) {
               {/* Job Title */}
               <div className="flex flex-col gap-1.5">
                 <Label className="text-zinc-300 font-medium text-xs">
-                  Job Title
+                  Job Title *
                 </Label>
                 <div className="relative flex items-center">
                   <FiBriefcase className="absolute left-3 w-4 h-4 text-zinc-500" />
@@ -208,15 +245,15 @@ export default function PostJobForm({company}) {
 
               {/* Industry / Category */}
               <div className="flex flex-col gap-1.5">
+                <Label className="text-zinc-300 font-medium text-xs mb-1.5">
+                  Industry / Category
+                </Label>
                 <Select
                   className="w-full"
                   placeholder="Select category"
-                  value={formData.category}
-                  onChange={(val) => handleChange("category", val)}
+                  selectedKeys={[formData.category]}
+                  onSelectionChange={(val) => handleChange("category", val)}
                 >
-                  <Label className="text-zinc-300 font-medium text-xs mb-1.5">
-                    Industry / Category
-                  </Label>
                   <Select.Trigger className={`${commonInputStyles} flex items-center justify-between cursor-pointer`}>
                     <Select.Value />
                     <Select.Indicator />
@@ -248,15 +285,15 @@ export default function PostJobForm({company}) {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {/* Job Type */}
               <div className="flex flex-col gap-1.5">
+                <Label className="text-zinc-300 font-medium text-xs mb-1.5">
+                  Job Type
+                </Label>
                 <Select
                   className="w-full"
                   placeholder="Select employment type"
-                  value={formData.type}
-                  onChange={(val) => handleChange("type", val)}
+                  selectedKeys={[formData.type]}
+                  onSelectionChange={(val) => handleChange("type", val)}
                 >
-                  <Label className="text-zinc-300 font-medium text-xs mb-1.5">
-                    Job Type
-                  </Label>
                   <Select.Trigger className={`${commonInputStyles} flex items-center justify-between cursor-pointer`}>
                     <Select.Value />
                     <Select.Indicator />
@@ -287,7 +324,7 @@ export default function PostJobForm({company}) {
               {/* Deadline */}
               <div className="flex flex-col gap-1.5">
                 <Label className="text-zinc-300 font-medium text-xs">
-                  Application Deadline
+                  Application Deadline *
                 </Label>
                 <div className="relative flex items-center">
                   <FiCalendar className="absolute left-3 w-4 h-4 text-zinc-500" />
@@ -334,15 +371,15 @@ export default function PostJobForm({company}) {
               </div>
 
               <div className="flex flex-col gap-1.5">
+                <Label className="text-zinc-300 font-medium text-xs mb-1.5">
+                  Currency
+                </Label>
                 <Select
                   className="w-full"
                   placeholder="Currency"
-                  value={formData.currency}
-                  onChange={(val) => handleChange("currency", val)}
+                  selectedKeys={[formData.currency]}
+                  onSelectionChange={(val) => handleChange("currency", val)}
                 >
-                  <Label className="text-zinc-300 font-medium text-xs mb-1.5">
-                    Currency
-                  </Label>
                   <Select.Trigger className={`${commonInputStyles} flex items-center justify-between cursor-pointer`}>
                     <Select.Value />
                     <Select.Indicator />
@@ -371,7 +408,7 @@ export default function PostJobForm({company}) {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
               <div className="md:col-span-2 flex flex-col gap-1.5">
                 <Label className="text-zinc-300 font-medium text-xs">
-                  Location
+                  Location {!formData.isRemote && "*"}
                 </Label>
                 <div className="relative flex items-center">
                   <FiMapPin className="absolute left-3 w-4 h-4 text-zinc-500" />
@@ -440,7 +477,7 @@ export default function PostJobForm({company}) {
 
             <div className="flex flex-col gap-1.5">
               <Label className="text-zinc-300 font-medium text-xs">
-                Responsibilities
+                Responsibilities *
               </Label>
               <TextArea
                 aria-label="Responsibilities"
@@ -454,7 +491,7 @@ export default function PostJobForm({company}) {
 
             <div className="flex flex-col gap-1.5">
               <Label className="text-zinc-300 font-medium text-xs">
-                Requirements
+                Requirements *
               </Label>
               <TextArea
                 aria-label="Requirements"
@@ -483,7 +520,7 @@ export default function PostJobForm({company}) {
           {/* Limit Warning Banner */}
           {isLimitReached && (
             <div className="p-3 bg-rose-500/10 border border-rose-500/20 rounded-lg text-xs text-rose-400">
-              You have reached your active job posting limit ({companyInfo.jobLimit} jobs) for the {companyInfo.plan} plan. Upgrade your subscription to publish more positions.
+              ⚠️ You have reached your active job posting limit ({company.jobLimit} jobs) for the {company.plan} plan. Upgrade your subscription to publish more positions.
             </div>
           )}
 
@@ -491,13 +528,14 @@ export default function PostJobForm({company}) {
           <div className="pt-4 border-t border-zinc-800/80 flex items-center justify-end gap-3">
             <Button
               type="button"
+              onClick={() => router.back()}
               className="bg-zinc-800/60 hover:bg-zinc-800 text-zinc-300 font-medium px-5 py-2 rounded-lg text-xs transition-colors"
             >
               Cancel
             </Button>
             <Button
               type="submit"
-              disabled={!canPost || isSubmitting}
+              disabled={isSubmitting}
               className="bg-white hover:bg-zinc-200 disabled:opacity-50 disabled:cursor-not-allowed text-zinc-950 font-semibold px-6 py-2 rounded-lg text-xs transition-colors"
             >
               {isSubmitting ? "Posting..." : "Post Job"}
