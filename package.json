@@ -13,6 +13,7 @@
     "@heroui/react": "^3.2.2",
     "@heroui/styles": "^3.2.2",
     "better-auth": "^1.6.25",
+    "lucide-react": "^1.35.0",
     "mongodb": "^7.5.0",
     "motion": "^12.42.2",
     "next": "16.2.10",
