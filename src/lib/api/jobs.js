@@ -7,6 +7,24 @@ export const getCompanyJobs = async (companyId, status="active") => {
     return res.json();
 }
 
-export const getJobs = async () => {
-    return serverFetch('/api/jobs')
-}
+// export const getJobs = async () => {
+//     return serverFetch('/api/jobs')
+// }
+
+
+// lib/api/jobs.js
+
+export const getJobs = async (filters = {}) => {
+    const queryParams = new URLSearchParams();
+
+    Object.entries(filters).forEach(([key, value]) => {
+        if (value !== undefined && value !== null && value !== "") {
+            queryParams.append(key, String(value));
+        }
+    });
+
+    const queryString = queryParams.toString();
+    const endpoint = queryString ? `/api/jobs?${queryString}` : '/api/jobs';
+
+    return serverFetch(endpoint);
+};
