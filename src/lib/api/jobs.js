@@ -28,3 +28,8 @@ export const getJobs = async (filters = {}) => {
 
     return serverFetch(endpoint);
 };
+
+
+export const getJobsById = async (jobId) => {
+    return serverFetch(`/api/jobs/${jobId}`)
+}

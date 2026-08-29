@@ -1,6 +1,5 @@
 "use client";
-
-import { Button, Card } from "@heroui/react";
+import { Card } from "@heroui/react";
 import {
   ArrowRight,
   BriefcaseBusiness,
@@ -9,6 +8,7 @@ import {
   MapPin,
   Wifi,
 } from "lucide-react";
+import Link from "next/link";
 
 export default function JobCard({ job }) {
   const formatSalary = (salary) => {
@@ -105,13 +105,14 @@ export default function JobCard({ job }) {
           </div>
         </div>
 
-        <Button
+        <Link
+          href={`/jobs/${job._id}`}
           color="primary"
           className="w-full font-semibold sm:w-auto"
-          endContent={<ArrowRight size={17} />}
+          endcontent={<ArrowRight size={17} />}
         >
           Apply Now
-        </Button>
+        </Link>
       </Card.Footer>
     </Card>
   );

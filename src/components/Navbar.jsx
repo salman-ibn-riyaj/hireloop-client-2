@@ -36,7 +36,7 @@ export default function HireloopNavbar() {
         {/* Desktop Navigation (Hidden on Mobile, flex on md screens and up) */}
         <div className="hidden md:flex items-center gap-6">
           <Link 
-            href="/JobsPage" 
+            href="/jobs" 
             className="text-zinc-300 hover:text-white text-sm font-medium transition-colors"
           >
             Browse Jobs
