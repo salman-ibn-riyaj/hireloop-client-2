@@ -3,13 +3,16 @@
 import React, { useState } from "react";
 import { Button, Link } from "@heroui/react";
 import { authClient } from "@/lib/auth-client"; 
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 
 export default function SignIn() {
   const router = useRouter();
   
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const searchParams = useSearchParams();
+  const redirectTo = searchParams.get("redirect") || '/'
+  console.log('redirect path pacci na keno', redirectTo);
 
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -35,7 +38,7 @@ export default function SignIn() {
         email,
         password,
         // Automatically takes the user home on successful session validation
-        callbackURL: "/", 
+        
       }, {
         onRequest: () => setLoading(true),
         onError: (ctx) => {
@@ -43,12 +46,11 @@ export default function SignIn() {
           setLoading(false);
         },
         onSuccess: () => {
+          router.push(redirectTo);
           setLoading(false);
           setSuccessMessage("Welcome back! Redirecting...");
           
-          setTimeout(() => {
-            router.push("/");
-          }, 1500);
+         
         }
       });
     } catch (err) {

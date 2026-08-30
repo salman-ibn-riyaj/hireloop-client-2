@@ -7,14 +7,14 @@ import { getJobsById } from '@/lib/api/jobs';
 import { Card, Button, Chip, Separator, Link as HeroLink } from '@heroui/react';
 
 // Lucide Icons
-import { 
-  MapPin, 
-  Briefcase, 
-  DollarSign, 
-  Calendar, 
-  Globe, 
-  ArrowLeft, 
-  CheckCircle2, 
+import {
+  MapPin,
+  Briefcase,
+  DollarSign,
+  Calendar,
+  Globe,
+  ArrowLeft,
+  CheckCircle2,
   Clock,
   Sparkles
 } from 'lucide-react';
@@ -55,8 +55,8 @@ export default async function JobDetailsPage({ params }) {
       {/* Navigation */}
       <div className="mb-6">
         <Link href="/jobs">
-          <Button 
-            variant="light" 
+          <Button
+            variant="light"
             startContent={<ArrowLeft size={18} />}
             className="font-medium"
           >
@@ -69,16 +69,16 @@ export default async function JobDetailsPage({ params }) {
       <Card className="p-6 mb-8 border-none shadow-md bg-content1">
         <Card.Header className="p-0 flex flex-col gap-4">
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 w-full">
-            
+
             {/* Company Info & Title */}
             <div className="flex items-center gap-4">
               <div className="relative w-16 h-16 rounded-xl overflow-hidden bg-default-100 flex-shrink-0 border border-default-200">
                 {job.companyLogo ? (
-                  <Image 
-                    src={job.companyLogo} 
-                    alt={job.companyName || 'Company Logo'} 
-                    fill 
-                    className="object-cover" 
+                  <Image
+                    src={job.companyLogo}
+                    alt={job.companyName || 'Company Logo'}
+                    fill
+                    className="object-cover"
                   />
                 ) : (
                   <div className="w-full h-full flex items-center justify-center text-default-400">
@@ -98,9 +98,9 @@ export default async function JobDetailsPage({ params }) {
 
             {/* Application Action */}
             <div className="w-full sm:w-auto flex flex-col sm:items-end gap-2">
-              <Button 
-                color="primary" 
-                size="lg" 
+              <Button
+                color="primary"
+                size="lg"
                 className="w-full sm:w-auto font-semibold shadow-lg shadow-primary/30"
               >
                 Apply Now
@@ -115,36 +115,36 @@ export default async function JobDetailsPage({ params }) {
 
           {/* Metadata Chips */}
           <div className="flex flex-wrap gap-3">
-            <Chip 
-              startcontent={<MapPin size={16} className="text-primary" />} 
-              variant="flat" 
+            <Chip
+              startcontent={<MapPin size={16} className="text-primary" />}
+              variant="flat"
               color="default"
             >
               {job.location}
             </Chip>
 
             {job.isRemote && (
-              <Chip 
-                startcontent={<Globe size={16} className="text-success" />} 
-                variant="flat" 
+              <Chip
+                startcontent={<Globe size={16} className="text-success" />}
+                variant="flat"
                 color="success"
               >
                 Remote
               </Chip>
             )}
 
-            <Chip 
-              startcontent={<Briefcase size={16} className="text-secondary" />} 
-              variant="flat" 
+            <Chip
+              startcontent={<Briefcase size={16} className="text-secondary" />}
+              variant="flat"
               color="secondary"
               className="capitalize"
             >
               {job.type}
             </Chip>
 
-            <Chip 
-              startcontent={<DollarSign size={16} className="text-warning" />} 
-              variant="flat" 
+            <Chip
+              startcontent={<DollarSign size={16} className="text-warning" />}
+              variant="flat"
               color="warning"
             >
               {formatSalary(job.salaryMin, job.currency)} - {formatSalary(job.salaryMax, job.currency)}
@@ -155,10 +155,10 @@ export default async function JobDetailsPage({ params }) {
 
       {/* Main Content Layout */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        
+
         {/* Left Section: Details */}
         <div className="lg:col-span-2 space-y-8">
-          
+
           {/* Responsibilities */}
           {job.responsibilities && (
             <Card className="p-6 border-none shadow-sm bg-content1">
@@ -274,17 +274,20 @@ export default async function JobDetailsPage({ params }) {
             <Separator className="my-4" />
 
             <Card.Footer className="p-0 flex-col items-stretch gap-3">
-              <Button color="primary" className="w-full font-semibold">
+              <Link
+                href={`/jobs/${id}/apply`}
+                className="w-full font-semibold bg-gradient-to-r from-blue-500 to-blue-600 text-white py-2 px-4 rounded-lg hover:from-blue-600 hover:to-blue-700 transition-all duration-300 block text-center shadow-md hover:shadow-lg"
+              >
                 Apply for Position
-              </Button>
-              <HeroLink
+              </Link>
+              {/* <HeroLink
                 aria-label="View original posting or company details"
                 href={`/companies/${job.companyId}`}
                 className="text-xs text-default-500 justify-center gap-1"
               >
                 View Company Profile
                 <HeroLink.Icon aria-hidden="true" />
-              </HeroLink>
+              </HeroLink> */}
             </Card.Footer>
           </Card>
         </div>
