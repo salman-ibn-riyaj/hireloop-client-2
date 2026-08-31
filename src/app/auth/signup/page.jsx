@@ -2,18 +2,22 @@
 
 import React, { useState } from "react";
 import { Button, Link } from "@heroui/react";
-import { authClient } from "@/lib/auth-client"; 
-import { useRouter } from "next/navigation";
-import {Description, Label, Radio, RadioGroup} from "@heroui/react";
+import { authClient } from "@/lib/auth-client";
+import { useRouter, useSearchParams } from "next/navigation";
+import { Description, Label, Radio, RadioGroup } from "@heroui/react";
 
 export default function SignUp() {
   const router = useRouter();
-  
+
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [role, setRole] = useState("seeker"); // Default role is 'seeker'
+  const searchParams = useSearchParams();
+  const redirectTo = searchParams.get('redirect') || '/';
+
+
 
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -47,7 +51,7 @@ export default function SignUp() {
         password,
         name,
         role,
-        callbackURL: "/", 
+
       }, {
         onRequest: () => setLoading(true),
         onError: (ctx) => {
@@ -57,10 +61,7 @@ export default function SignUp() {
         onSuccess: () => {
           setLoading(false);
           setSuccessMessage("Account created successfully! Redirecting...");
-          
-          setTimeout(() => {
-            router.push("/");
-          }, 1500);
+          router.push(redirectTo);
         }
       });
     } catch (err) {
@@ -71,9 +72,9 @@ export default function SignUp() {
 
   // Modern Eye & Eyelash toggle icon component
   const PasswordToggleIcon = ({ isVisible, toggle }) => (
-    <button 
-      type="button" 
-      onClick={toggle} 
+    <button
+      type="button"
+      onClick={toggle}
       className="absolute right-3 top-1/2 -translate-y-1/2 focus:outline-none p-1 rounded-md hover:bg-zinc-900/60 transition-colors flex items-center justify-center z-20"
       aria-label="toggle password visibility"
     >
@@ -94,7 +95,7 @@ export default function SignUp() {
 
   return (
     <main className="w-full min-h-[90vh] bg-[#050505] text-white px-6 flex flex-col items-center justify-center relative overflow-hidden font-sans">
-      
+
       {/* Background Subtle Radial Glow */}
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] h-[400px] bg-indigo-600/5 blur-[120px] rounded-full pointer-events-none z-0" />
 
@@ -110,7 +111,7 @@ export default function SignUp() {
 
       {/* Card Interface Wrapper */}
       <div className="relative z-10 w-full max-w-md bg-[#0a0a0c]/60 backdrop-blur-xl border border-zinc-900/80 p-8 rounded-2xl shadow-2xl flex flex-col gap-6">
-        
+
         {/* Header Block */}
         <div className="flex flex-col gap-1.5 text-center sm:text-left">
           <h1 className="text-2xl sm:text-3xl font-medium tracking-tight text-zinc-100">
@@ -130,7 +131,7 @@ export default function SignUp() {
 
         {/* Input Interactive Form Stack */}
         <form className="flex flex-col gap-4" onSubmit={handleSignUp}>
-          
+
           {/* Full Name Input */}
           <div className="flex flex-col gap-1">
             <label className="text-zinc-400 text-xs font-medium pb-1">Name</label>
@@ -170,7 +171,7 @@ export default function SignUp() {
             </div>
           </div>
 
-          
+
 
           {/* Confirm Password Input Field */}
           <div className="flex flex-col gap-1">
@@ -189,29 +190,29 @@ export default function SignUp() {
 
           {/* Role Selection Dropdown */}
           <div className="flex flex-col gap-4">
-      <Label>Select Role</Label>
-      <RadioGroup onChange={value => setRole(value)} defaultValue="seeker" name="role" orientation="horizontal">
-        <Radio value="seeker">
-          <Radio.Content>
-            <Radio.Control>
-              <Radio.Indicator />
-            </Radio.Control>
-            Seeker
-          </Radio.Content>
-         
-        </Radio>
-        <Radio value="Recruiter">
-          <Radio.Content>
-            <Radio.Control>
-              <Radio.Indicator />
-            </Radio.Control>
-            Recruiter
-          </Radio.Content>
-         
-        </Radio>
-        
-      </RadioGroup>
-    </div>
+            <Label>Select Role</Label>
+            <RadioGroup onChange={value => setRole(value)} defaultValue="seeker" name="role" orientation="horizontal">
+              <Radio value="seeker">
+                <Radio.Content>
+                  <Radio.Control>
+                    <Radio.Indicator />
+                  </Radio.Control>
+                  Seeker
+                </Radio.Content>
+
+              </Radio>
+              <Radio value="Recruiter">
+                <Radio.Content>
+                  <Radio.Control>
+                    <Radio.Indicator />
+                  </Radio.Control>
+                  Recruiter
+                </Radio.Content>
+
+              </Radio>
+
+            </RadioGroup>
+          </div>
 
           {/* Form Submit Action Button */}
           <Button
@@ -227,7 +228,7 @@ export default function SignUp() {
         {/* Alternate Redirect Footer Options */}
         <div className="text-center text-xs text-zinc-500 font-normal mt-1">
           Already have an account?{" "}
-          <Link href="/login" className="text-zinc-300 hover:text-white transition-colors text-xs font-medium underline underline-offset-4">
+          <Link href={`/auth/signin?redirect=${redirectTo}`} className="text-zinc-300 hover:text-white transition-colors text-xs font-medium underline underline-offset-4">
             Sign in
           </Link>
         </div>

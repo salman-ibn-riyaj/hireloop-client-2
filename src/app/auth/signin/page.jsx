@@ -2,17 +2,17 @@
 
 import React, { useState } from "react";
 import { Button, Link } from "@heroui/react";
-import { authClient } from "@/lib/auth-client"; 
-import { useRouter, useSearchParams } from "next/navigation";
+import { authClient } from "@/lib/auth-client";
+import { redirect, useRouter, useSearchParams } from "next/navigation";
 
 export default function SignIn() {
   const router = useRouter();
-  
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const searchParams = useSearchParams();
   const redirectTo = searchParams.get("redirect") || '/'
-  console.log('redirect path pacci na keno', redirectTo);
+
 
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -38,7 +38,7 @@ export default function SignIn() {
         email,
         password,
         // Automatically takes the user home on successful session validation
-        
+
       }, {
         onRequest: () => setLoading(true),
         onError: (ctx) => {
@@ -46,11 +46,15 @@ export default function SignIn() {
           setLoading(false);
         },
         onSuccess: () => {
-          router.push(redirectTo);
+
+          console.log('redirect path pacci na keno', JSON.stringify(redirectTo));
           setLoading(false);
           setSuccessMessage("Welcome back! Redirecting...");
-          
-         
+          router.push(redirectTo)
+
+
+
+
         }
       });
     } catch (err) {
@@ -61,7 +65,7 @@ export default function SignIn() {
 
   return (
     <main className="w-full min-h-[90vh] bg-[#050505] text-white px-6 flex flex-col items-center justify-center relative overflow-hidden font-sans">
-      
+
       {/* Background Subtle Radial Glow */}
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] h-[400px] bg-indigo-600/5 blur-[120px] rounded-full pointer-events-none z-0" />
 
@@ -77,7 +81,7 @@ export default function SignIn() {
 
       {/* Card Interface Wrapper */}
       <div className="relative z-10 w-full max-w-md bg-[#0a0a0c]/60 backdrop-blur-xl border border-zinc-900/80 p-8 rounded-2xl shadow-2xl flex flex-col gap-6">
-        
+
         {/* Header Block */}
         <div className="flex flex-col gap-1.5 text-center sm:text-left">
           <h1 className="text-2xl sm:text-3xl font-medium tracking-tight text-zinc-100">
@@ -97,7 +101,7 @@ export default function SignIn() {
 
         {/* Input Interactive Form Stack */}
         <form className="flex flex-col gap-4" onSubmit={handleSignIn}>
-          
+
           {/* Email Address Input */}
           <div className="flex flex-col gap-1">
             <label className="text-zinc-400 text-xs font-medium pb-1">Email</label>
@@ -126,11 +130,11 @@ export default function SignIn() {
                 onChange={(e) => setPassword(e.target.value)}
                 className="w-full border border-zinc-800 hover:border-zinc-700 focus:border-zinc-600 focus:outline-none bg-zinc-900/20 h-11 pl-3 pr-10 rounded-xl text-sm text-zinc-200 placeholder:text-zinc-600 transition-all"
               />
-              
+
               {/* Password Eye Toggle Icon */}
-              <button 
-                type="button" 
-                onClick={togglePasswordVisibility} 
+              <button
+                type="button"
+                onClick={togglePasswordVisibility}
                 className="absolute right-3 top-1/2 -translate-y-1/2 focus:outline-none p-1 rounded-md hover:bg-zinc-900/60 transition-colors flex items-center justify-center z-20"
                 aria-label="toggle password visibility"
               >
@@ -162,7 +166,7 @@ export default function SignIn() {
         {/* Alternate Redirect Footer Options */}
         <div className="text-center text-xs text-zinc-500 font-normal mt-1">
           Don't have an account?{" "}
-          <Link href="/auth/signup" className="text-zinc-300 hover:text-white transition-colors text-xs font-medium underline underline-offset-4">
+          <Link href={`/auth/signup?redirect=${redirectTo}`} className="text-zinc-300 hover:text-white transition-colors text-xs font-medium underline underline-offset-4">
             Sign up
           </Link>
         </div>
