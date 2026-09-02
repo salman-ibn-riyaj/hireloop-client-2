@@ -32,7 +32,7 @@ const JobApply = ({ applicant, job }) => {
             companyName: job?.companyName,
             applicantName: applicant?.name,
             applicantEmail: applicant?.email,
-            applicantId: applicant?._id,
+            applicantId: applicant?.id,
         };
 
         console.log("Job Application Payload:", payload);
