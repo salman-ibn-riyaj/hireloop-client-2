@@ -50,7 +50,7 @@ export default function HireloopNavbar() {
           </Link>
           
           <Link 
-            href="/pricing" 
+            href="/plans" 
             className="text-zinc-300 hover:text-white text-sm font-medium transition-colors"
           >
             Pricing
@@ -115,14 +115,14 @@ export default function HireloopNavbar() {
             Browse Jobs
           </Link>
           <Link 
-            href="/company" 
+            href="/companies" 
             onClick={() => setIsOpen(false)}
             className="text-zinc-300 hover:text-white text-base font-medium py-2 border-b border-zinc-800/50"
           >
             Company
           </Link>
           <Link 
-            href="/pricing" 
+            href="/plans" 
             onClick={() => setIsOpen(false)}
             className="text-zinc-300 hover:text-white text-base font-medium py-2"
           >
