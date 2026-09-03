@@ -1,7 +1,6 @@
 'use client';
 
 import React, { useState } from 'react';
-import Link from 'next/link';
 
 export default function PricingPage() {
   const [userType, setUserType] = useState('seeker'); // 'seeker' | 'recruiter'
@@ -14,6 +13,7 @@ export default function PricingPage() {
   const seekerPlans = [
     {
       name: 'Free',
+      id: "seeker_free",
       price: '$0',
       period: 'forever',
       description: 'Essential tools for casual job searching and getting started.',
@@ -30,6 +30,7 @@ export default function PricingPage() {
     },
     {
       name: 'Pro',
+      id: "seeker_pro",
       price: '$19',
       period: 'per month',
       description: 'Designed for active candidates targeting consistent interviews.',
@@ -47,6 +48,7 @@ export default function PricingPage() {
     },
     {
       name: 'Premium',
+      id:"seeker_premium",
       price: '$39',
       period: 'per month',
       description: 'Maximum exposure and tools to fast-track your executive career.',
@@ -68,6 +70,7 @@ export default function PricingPage() {
     {
       name: 'Free',
       price: '$0',
+      id: "recruiter_free",
       period: 'forever',
       description: "Ideal for a company's initial hire or trial recruitment.",
       badge: null,
@@ -83,6 +86,7 @@ export default function PricingPage() {
     },
     {
       name: 'Growth',
+      id: "recruiter_growth",
       price: '$49',
       period: 'per month',
       description: 'Perfect for growing teams needing consistent talent pipelines.',
@@ -100,6 +104,7 @@ export default function PricingPage() {
     },
     {
       name: 'Enterprise',
+      id: "recruiter_enterprise",
       price: '$149',
       period: 'per month',
       description: 'Comprehensive hiring suite for scaling corporations and agencies.',
@@ -164,25 +169,23 @@ export default function PricingPage() {
         <div className="relative z-10 mt-8 sm:mt-12 inline-flex items-center p-1.5 rounded-full bg-slate-200/80 dark:bg-zinc-900 border border-slate-300/50 dark:border-zinc-800 backdrop-blur-md shadow-inner">
           <button
             onClick={() => setUserType('seeker')}
-            className={`flex items-center gap-2 px-6 py-2.5 rounded-full text-sm font-bold transition-all duration-300 ${
-              userType === 'seeker'
-                ? 'bg-indigo-600 text-white shadow-md shadow-indigo-500/25'
-                : 'text-slate-600 dark:text-zinc-400 hover:text-slate-900 dark:hover:text-white'
-            }`}
+            className={`flex items-center gap-2 px-6 py-2.5 rounded-full text-sm font-bold transition-all duration-300 ${userType === 'seeker'
+              ? 'bg-indigo-600 text-white shadow-md shadow-indigo-500/25'
+              : 'text-slate-600 dark:text-zinc-400 hover:text-slate-900 dark:hover:text-white'
+              }`}
           >
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
             </svg>
             For Job Seekers
           </button>
-          
+
           <button
             onClick={() => setUserType('recruiter')}
-            className={`flex items-center gap-2 px-6 py-2.5 rounded-full text-sm font-bold transition-all duration-300 ${
-              userType === 'recruiter'
-                ? 'bg-indigo-600 text-white shadow-md shadow-indigo-500/25'
-                : 'text-slate-600 dark:text-zinc-400 hover:text-slate-900 dark:hover:text-white'
-            }`}
+            className={`flex items-center gap-2 px-6 py-2.5 rounded-full text-sm font-bold transition-all duration-300 ${userType === 'recruiter'
+              ? 'bg-indigo-600 text-white shadow-md shadow-indigo-500/25'
+              : 'text-slate-600 dark:text-zinc-400 hover:text-slate-900 dark:hover:text-white'
+              }`}
           >
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
@@ -198,11 +201,10 @@ export default function PricingPage() {
           {currentPlans.map((plan, idx) => (
             <div
               key={idx}
-              className={`relative flex flex-col justify-between rounded-3xl p-6 sm:p-8 transition-all duration-300 ${
-                plan.isPopular
-                  ? 'border-2 border-indigo-500 bg-white dark:bg-zinc-900 shadow-2xl shadow-indigo-500/10 dark:shadow-none scale-100 lg:-translate-y-2'
-                  : 'border border-slate-200 dark:border-zinc-800 bg-white/70 dark:bg-zinc-900/50 backdrop-blur-md shadow-lg shadow-slate-200/50 dark:shadow-none hover:border-slate-300 dark:hover:border-zinc-700'
-              }`}
+              className={`relative flex flex-col justify-between rounded-3xl p-6 sm:p-8 transition-all duration-300 ${plan.isPopular
+                ? 'border-2 border-indigo-500 bg-white dark:bg-zinc-900 shadow-2xl shadow-indigo-500/10 dark:shadow-none scale-100 lg:-translate-y-2'
+                : 'border border-slate-200 dark:border-zinc-800 bg-white/70 dark:bg-zinc-900/50 backdrop-blur-md shadow-lg shadow-slate-200/50 dark:shadow-none hover:border-slate-300 dark:hover:border-zinc-700'
+                }`}
             >
               {/* Popular Badge */}
               {plan.badge && (
@@ -253,16 +255,17 @@ export default function PricingPage() {
               </div>
 
               {/* Action Button */}
-              <Link
-                href={plan.buttonHref}
-                className={`w-full py-3.5 px-6 rounded-2xl font-bold text-sm text-center transition-all duration-200 block ${
-                  plan.isPopular
+              <form action="/api/checkout_sessions" method="POST">
+              <input type="hidden" name="plan_id" value={plan.id} />
+                <section>
+                  <button type="submit" role="link" className={`w-full py-3.5 px-6 rounded-2xl font-bold text-sm text-center transition-all duration-200 block ${plan.isPopular
                     ? 'bg-indigo-600 hover:bg-indigo-500 text-white shadow-lg shadow-indigo-500/25 hover:shadow-indigo-500/35 active:scale-[0.98]'
                     : 'bg-slate-100 hover:bg-slate-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-slate-900 dark:text-white active:scale-[0.98]'
-                }`}
-              >
-                {plan.buttonText}
-              </Link>
+                    }`}>
+                    Checkout
+                  </button>
+                </section>
+              </form>
             </div>
           ))}
         </div>
