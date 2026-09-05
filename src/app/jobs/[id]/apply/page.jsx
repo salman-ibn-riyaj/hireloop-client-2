@@ -64,7 +64,7 @@ const ApplyPage = async ({ params }) => {
             </div>
 
             <h2 className="text-xl sm:text-2xl md:text-3xl font-extrabold text-slate-900 dark:text-white tracking-tight leading-snug max-w-xl">
-              You have applied <span className="bg-gradient-to-r from-indigo-600 to-violet-600 dark:from-indigo-400 dark:to-violet-400 bg-clip-text text-transparent">{applications.length}</span> out of {plan.maxApplications} jobs.
+              You have applied <span className="bg-gradient-to-r from-indigo-600 to-violet-600 dark:from-indigo-400 dark:to-violet-400 bg-clip-text text-transparent">{applications.length}</span> out of {plan.maxApplicationsPerMonth} jobs.
             </h2>
 
             {/* Application Progress Dots */}
