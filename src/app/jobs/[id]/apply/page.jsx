@@ -5,6 +5,7 @@ import React from 'react'
 import JobApply from './JobApply';
 import { getApplicationsByApplicant } from '@/lib/api/applications';
 import Link from 'next/link';
+import { getPlanByPlanId } from '@/lib/api/plan';
 
 const ApplyPage = async ({ params }) => {
 
@@ -40,12 +41,12 @@ const ApplyPage = async ({ params }) => {
   const job = await getJobsById(id);
   console.log('job', job)
 
-  const plan = {
-    name: "Free Plan",
-    maxApplications: 3
-  }
+  
 
-  const isLimitReached = applications.length >= plan.maxApplications;
+  const plan = await getPlanByPlanId(user?.plan || "seeker_free")
+  console.log("plan ashce", plan)
+
+  const isLimitReached = applications.length >= plan.maxApplicationsPerMonth;
 
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-zinc-950 px-4 py-8 sm:py-12 lg:py-16 transition-colors duration-300">
@@ -68,7 +69,7 @@ const ApplyPage = async ({ params }) => {
 
             {/* Application Progress Dots */}
             <div className="mt-4 flex gap-2">
-              {Array.from({ length: plan.maxApplications }).map((_, index) => (
+              {Array.from({ length: plan.maxApplicationsPerMonth }).map((_, index) => (
                 <div
                   key={index}
                   className={`h-2.5 w-8 rounded-full transition-all duration-300 ${

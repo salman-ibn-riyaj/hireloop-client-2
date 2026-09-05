@@ -45,12 +45,15 @@ export default function SignUp() {
 
     setLoading(true);
 
+    const plan = role === "seeker" ? "seeker_free": "recruiter_free"
+
     try {
       await authClient.signUp.email({
         email,
         password,
         name,
         role,
+        plan,
 
       }, {
         onRequest: () => setLoading(true),
