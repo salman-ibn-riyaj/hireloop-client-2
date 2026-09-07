@@ -70,7 +70,7 @@ export default function UnauthorizedPage() {
           {/* Action Buttons */}
           <div className="space-y-3">
             <Link
-              href="/login"
+              href="/auth/signin"
               className="flex w-full items-center justify-center gap-2 rounded-xl bg-rose-600 px-4 py-3 text-sm font-semibold text-white shadow-lg shadow-rose-600/25 transition-all duration-200 hover:bg-rose-500 active:scale-[0.98]"
             >
               <KeyRound className="h-4 w-4" />
