@@ -32,6 +32,7 @@ const JobApply = ({ applicant, job }) => {
             companyName: job?.companyName,
             applicantName: applicant?.name,
             applicantEmail: applicant?.email,
+            status: "applied",
             applicantId: applicant?.id,
         };
 
