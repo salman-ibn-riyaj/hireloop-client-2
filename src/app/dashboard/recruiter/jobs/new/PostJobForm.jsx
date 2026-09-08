@@ -74,7 +74,7 @@ export default function PostJobForm({ company }) {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     console.log("📨 Form submit triggered");
     console.log("Jobs count:", company?.currentJobsCount, "Limit:", company?.jobLimit);
 
@@ -132,9 +132,8 @@ export default function PostJobForm({ company }) {
         toast.custom(
           (t) => (
             <div
-              className={`${
-                t.visible ? "animate-enter" : "animate-leave"
-              } max-w-sm w-full bg-zinc-900 border border-emerald-500/30 shadow-2xl rounded-xl pointer-events-auto flex items-center p-4 gap-3 text-zinc-100 ring-1 ring-black/5`}
+              className={`${t.visible ? "animate-enter" : "animate-leave"
+                } max-w-sm w-full bg-zinc-900 border border-emerald-500/30 shadow-2xl rounded-xl pointer-events-auto flex items-center p-4 gap-3 text-zinc-100 ring-1 ring-black/5`}
             >
               <div className="p-2 bg-emerald-500/10 rounded-lg text-emerald-400 border border-emerald-500/20 flex-shrink-0">
                 <FiCheckCircle className="w-5 h-5" />
@@ -204,6 +203,10 @@ export default function PostJobForm({ company }) {
             <FaBuilding className="w-3.5 h-3.5 text-zinc-400" />
             <span className="text-zinc-400">Posting as:</span>
             <span className="font-medium text-zinc-200">{company.name}</span>
+            <span className="inline-flex items-center gap-x-1.5 rounded-full bg-emerald-500/10 px-3 py-1 text-xs font-semibold text-emerald-400 ring-1 ring-inset ring-emerald-500/20 shadow-sm backdrop-blur-md">
+              <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse" />
+              {company.status}
+            </span>
           </div>
           <div className="flex items-center gap-2 text-zinc-400">
             <span>
@@ -216,8 +219,26 @@ export default function PostJobForm({ company }) {
           </div>
         </div>
 
+        {company.status === 'pending' && (
+          <div className="px-6 py-3 bg-zinc-900/40 border-b border-zinc-800/60 flex flex-wrap items-center justify-between gap-3 text-xs">
+            <div className="flex items-center gap-3 rounded-xl border border-amber-500/20 bg-amber-500/10 p-4 shadow-lg shadow-amber-500/5 backdrop-blur-md">
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-gradient-to-tr from-amber-600 to-yellow-400 text-zinc-950 shadow-md shadow-amber-500/20">
+                <svg className="h-5 w-5 animate-spin" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                </svg>
+              </div>
+              <div>
+                <h2 className="bg-gradient-to-r from-amber-200 via-yellow-300 to-amber-400 bg-clip-text text-lg font-bold tracking-wide text-transparent">
+                  Need to wait for approval
+                </h2>
+                <p className="text-xs text-amber-200/70">Your request is currently under review.</p>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Form Body */}
-        <form onSubmit={handleSubmit} className="p-6 space-y-6">
+        {company.status === 'approved' && <form onSubmit={handleSubmit} className="p-6 space-y-6">
           {/* Section 1: Job Info */}
           <div className="space-y-4">
             <h2 className="text-xs font-semibold text-zinc-400 uppercase tracking-wider">
@@ -416,9 +437,8 @@ export default function PostJobForm({ company }) {
                     aria-label="Location"
                     placeholder="e.g. San Francisco, CA"
                     disabled={formData.isRemote}
-                    className={`${commonInputStyles} pl-9 transition-all ${
-                      formData.isRemote ? "opacity-50 cursor-not-allowed bg-zinc-900/40" : ""
-                    }`}
+                    className={`${commonInputStyles} pl-9 transition-all ${formData.isRemote ? "opacity-50 cursor-not-allowed bg-zinc-900/40" : ""
+                      }`}
                     value={formData.location}
                     onChange={(e) => handleChange("location", e)}
                   />
@@ -427,17 +447,15 @@ export default function PostJobForm({ company }) {
 
               {/* Remote Toggle Box */}
               <div
-                className={`h-[42px] flex items-center justify-between px-3 rounded-lg border transition-colors ${
-                  formData.isRemote
-                    ? "border-emerald-500/40 bg-emerald-500/10"
-                    : "border-zinc-800 bg-zinc-900/80"
-                }`}
+                className={`h-[42px] flex items-center justify-between px-3 rounded-lg border transition-colors ${formData.isRemote
+                  ? "border-emerald-500/40 bg-emerald-500/10"
+                  : "border-zinc-800 bg-zinc-900/80"
+                  }`}
               >
                 <span className="text-xs text-zinc-300 flex items-center gap-1.5">
                   <FiGlobe
-                    className={`w-4 h-4 transition-colors ${
-                      formData.isRemote ? "text-emerald-400" : "text-zinc-400"
-                    }`}
+                    className={`w-4 h-4 transition-colors ${formData.isRemote ? "text-emerald-400" : "text-zinc-400"
+                      }`}
                   />
                   Remote Job
                 </span>
@@ -447,18 +465,16 @@ export default function PostJobForm({ company }) {
                 >
                   <Switch.Content>
                     <Switch.Control
-                      className={`w-9 h-5 rounded-full flex items-center px-0.5 border cursor-pointer transition-colors ${
-                        formData.isRemote
-                          ? "bg-emerald-500 border-emerald-400"
-                          : "bg-zinc-800 border-zinc-700"
-                      }`}
+                      className={`w-9 h-5 rounded-full flex items-center px-0.5 border cursor-pointer transition-colors ${formData.isRemote
+                        ? "bg-emerald-500 border-emerald-400"
+                        : "bg-zinc-800 border-zinc-700"
+                        }`}
                     >
                       <Switch.Thumb
-                        className={`w-3.5 h-3.5 rounded-full transition-all duration-200 transform ${
-                          formData.isRemote
-                            ? "bg-white translate-x-4 shadow-sm"
-                            : "bg-zinc-400 translate-x-0"
-                        }`}
+                        className={`w-3.5 h-3.5 rounded-full transition-all duration-200 transform ${formData.isRemote
+                          ? "bg-white translate-x-4 shadow-sm"
+                          : "bg-zinc-400 translate-x-0"
+                          }`}
                       />
                     </Switch.Control>
                   </Switch.Content>
@@ -541,7 +557,7 @@ export default function PostJobForm({ company }) {
               {isSubmitting ? "Posting..." : "Post Job"}
             </Button>
           </div>
-        </form>
+        </form>}
       </div>
     </div>
   );

@@ -23,7 +23,8 @@ export default function HireloopNavbar() {
   const dashBoardLinks = [
     {
       seeker: '/dashboard/seeker',
-      recruiter: '/dashboard/recruiter'
+      recruiter: '/dashboard/recruiter',
+      admin: '/dashboard/admin'
     }
   ];
 

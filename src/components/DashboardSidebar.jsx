@@ -10,7 +10,6 @@ import { HiBriefcase, HiBuildingOffice, HiCreditCard } from "react-icons/hi2";
 export async function DashboardSidebar() {
 
   const user = await getUserSession();
-  console.log("user ki ashe nai", user);
 
   const recruiterNavItems = [
     { icon: House, href: "/dashboard/recruiter", label: "Home" },

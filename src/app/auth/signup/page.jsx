@@ -152,7 +152,7 @@ export default function SignUp() {
             <label className="text-zinc-400 text-xs font-medium pb-1">Email</label>
             <input
               type="email"
-              placeholder="you@example.com"
+              placeholder="Enter your email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               className="w-full border border-zinc-800 hover:border-zinc-700 focus:border-zinc-600 focus:outline-none bg-zinc-900/20 h-11 px-3 rounded-xl text-sm text-zinc-200 placeholder:text-zinc-600 transition-all"
@@ -204,7 +204,7 @@ export default function SignUp() {
                 </Radio.Content>
 
               </Radio>
-              <Radio value="Recruiter">
+              <Radio value="recruiter">
                 <Radio.Content>
                   <Radio.Control>
                     <Radio.Indicator />

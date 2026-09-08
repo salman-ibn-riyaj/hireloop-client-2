@@ -134,7 +134,7 @@ export default function RecruiterCompanyPage({recruiter, recruiterCompany}) {
       const updatedCompanyData = {
         ...formData,
         logo: finalLogoUrl,
-        status: isEditing ? company.status : "Pending",
+        status: isEditing ? company.status : "pending",
         recruiterId: recruiter.id
         
       };
