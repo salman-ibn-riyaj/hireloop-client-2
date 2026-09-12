@@ -165,13 +165,13 @@ export default function RecruiterCompanyPage({recruiter, recruiterCompany}) {
     switch (status) {
       case "Approved":
         return (
-          <Chip color="success" variant="flat" startContent={<FiCheckCircle />}>
+          <Chip color="success" variant="flat" startcontent={<FiCheckCircle />}>
             Approved
           </Chip>
         );
       case "Rejected":
         return (
-          <Chip color="danger" variant="flat" startContent={<FiXCircle />}>
+          <Chip color="danger" variant="flat" startcontent={<FiXCircle />}>
             Rejected
           </Chip>
         );
@@ -193,7 +193,7 @@ export default function RecruiterCompanyPage({recruiter, recruiterCompany}) {
           <Button
             color="primary"
             variant="solid"
-            startContent={<FiEdit />}
+            startcontent={<FiEdit />}
             onPress={handleOpenEdit}
             className="w-full xs:w-auto bg-blue-600 hover:bg-blue-500 text-white font-semibold shadow-lg shadow-blue-500/20 ring-2 ring-blue-400/30 transition-all duration-200"
           >
@@ -218,7 +218,7 @@ export default function RecruiterCompanyPage({recruiter, recruiterCompany}) {
             <Button
               color="primary"
               size="lg"
-              startContent={<FiPlus />}
+              startcontent={<FiPlus />}
               onPress={handleOpenRegister}
               className="w-full sm:w-auto font-medium mt-2"
             >
