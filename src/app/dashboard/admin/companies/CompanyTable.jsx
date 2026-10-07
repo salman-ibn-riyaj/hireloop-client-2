@@ -64,56 +64,7 @@ export default function CompanyTable({ companies = [] }) {
   };
 
   // GSAP micro-animation on action button click
-  // const handleAction = async (e, companyId, actionType) => {
-  //   // GSAP Button Ripple / Pulse Animation
-  //   if (e?.currentTarget) {
-  //     gsap.to(e.currentTarget, {
-  //       scale: 0.92,
-  //       duration: 0.1,
-  //       yoyo: true,
-  //       repeat: 1,
-  //       ease: "power2.inOut",
-  //     });
-  //   }
-
-  //   setActionLoading((prev) => ({ ...prev, [companyId]: actionType }));
-  //   try {
-  //     // Backend API call placeholder
-  //     console.log(`Executing ${actionType} on company: ${companyId}`);
-  //     await new Promise((resolve) => setTimeout(resolve, 800));
-  //   } catch (err) {
-  //     console.error(`Failed to execute ${actionType}:`, err);
-  //   } finally {
-  //     setActionLoading((prev) => ({ ...prev, [companyId]: null }));
-  //   }
-  // };
-  // GSAP micro-animation on action button click
-  // const handleAction = async (e, companyId, actionType) => {
-  //   // GSAP Button Ripple / Pulse Animation
-  //   if (e?.currentTarget) {
-  //     gsap.to(e.currentTarget, {
-  //       scale: 0.92,
-  //       duration: 0.1,
-  //       yoyo: true,
-  //       repeat: 1,
-  //       ease: "power2.inOut",
-  //     });
-  //   }
-
-  //   setActionLoading((prev) => ({ ...prev, [companyId]: actionType }));
-  //   try {
-  //     const status = actionType === "approve" ? "approved" : "rejected";
-  //     await updateCompany(companyId, { status });
-  //   } catch (err) {
-  //     console.error(`Failed to execute ${actionType}:`, err);
-  //   } finally {
-  //     setActionLoading((prev) => ({ ...prev, [companyId]: null }));
-  //   }
-  // };
-
-  // GSAP micro-animation on action button click
   const handleAction = async (e, companyId, actionType) => {
-    // GSAP Button Ripple / Pulse Animation
     if (e?.currentTarget) {
       gsap.to(e.currentTarget, {
         scale: 0.92,
@@ -239,6 +190,14 @@ export default function CompanyTable({ companies = [] }) {
                 </Table.Column>
                 <Table.Column
                   allowsSorting
+                  id="jobCount"
+                  key="jobCount"
+                  className="bg-default-100/80 dark:bg-default-50/10 text-default-600 font-bold text-[11px] uppercase tracking-wider py-4 px-5"
+                >
+                  Jobs
+                </Table.Column>
+                <Table.Column
+                  allowsSorting
                   id="status"
                   className="bg-default-100/80 dark:bg-default-50/10 text-default-600 font-bold text-[11px] uppercase tracking-wider py-4 px-5"
                 >
@@ -290,7 +249,7 @@ export default function CompanyTable({ companies = [] }) {
                           <Avatar
                             name={initials}
                             fallback={initials}
-                            src={company.logo}
+                            src={company.logo || undefined}
                             size="sm"
                             className="bg-primary-50 dark:bg-primary-900/30 text-primary-600 dark:text-primary-300 font-bold shrink-0 ring-1 ring-primary-500/20"
                           />
@@ -318,6 +277,18 @@ export default function CompanyTable({ companies = [] }) {
                           {company.industry?.trim() ? company.industry : "General"}
                         </Chip>
                       </Table.Cell>
+
+                      <Table.Cell className="py-3.5 px-5">
+                        <Chip
+                          size="sm"
+                          variant="flat"
+                          color="default"
+                          className="capitalize font-semibold text-xs border border-default-200/50 dark:border-default-100/10"
+                        >
+                          {company.jobCount ? company.jobCount : "0"}
+                        </Chip>
+                      </Table.Cell>
+
 
                       {/* Status */}
                       <Table.Cell className="py-3.5 px-5">
@@ -383,8 +354,7 @@ export default function CompanyTable({ companies = [] }) {
                   <div className="flex items-center gap-3 min-w-0">
                     <Avatar
                       name={initials}
-                      fallback={initials}
-                      src={company.logo}
+                      src={company.logo || undefined}
                       size="sm"
                       className="bg-primary-50 dark:bg-primary-900/30 text-primary-600 dark:text-primary-300 font-bold shrink-0 ring-1 ring-primary-500/20"
                     />
