@@ -10,7 +10,7 @@ const baseUrl = process.env.NEXT_PUBLIC_SERVER_URL;
 // }
 
 export const authHeader = async () => {
-    const token  = await getUserToken();
+    const token = await getUserToken();
 
     const header = token ? {
         'Authorization': `Bearer ${token}`
@@ -22,7 +22,7 @@ export const authHeader = async () => {
 export const serverFetch = async (path) => {
     try {
         const res = await fetch(`${baseUrl}${path}`);
-        
+
         // ✅ Check status
         if (!res.ok) {
             console.error(`API Error: ${res.status}`);
@@ -31,7 +31,7 @@ export const serverFetch = async (path) => {
 
         // ✅ Get text first
         const text = await res.text();
-        
+
         // ✅ Check if empty
         if (!text || text.trim() === "") {
             console.warn("Empty response");
@@ -49,11 +49,11 @@ export const serverFetch = async (path) => {
 }
 
 export const protectedFetch = async (path) => {
-    const res =  await fetch(`${baseUrl}${path}`, {
+    const res = await fetch(`${baseUrl}${path}`, {
         headers: await authHeader()
     })
 
-    return res.json()
+     return handleStatusCodes(res);
 }
 
 export const serverMutation = async (path, data, method = 'POST') => {
@@ -69,6 +69,18 @@ export const serverMutation = async (path, data, method = 'POST') => {
     });
 
     // handle 401, 402, 403
+    console.log('serverMutation response status:', res.status);
+
+    return handleStatusCodes(res);
+}
+
+const handleStatusCodes = (res) => {
+    if (res.status === 401) {
+        redirect('/unauthorized');
+    }
+    else if (res.status === 403) {
+        redirect('/unauthorized');
+    }
 
     return res.json();
 }
