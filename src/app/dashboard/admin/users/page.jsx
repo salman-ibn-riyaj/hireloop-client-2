@@ -7,6 +7,7 @@ import UsersTable from '../../UsersTable';
 const AdminUsersPage = async () => {
     const data = await getUsersLists();
     const users = data.users || [];
+    console.log('Fetched users:', users); // Debugging line to check the fetched users
 
     return (
         <DashboardAnimations>

@@ -20,6 +20,7 @@ export default function JobCard({ job }) {
   };
 
   const workMode = job.isRemote ? "Remote" : "On-site";
+  const hasLogo = Boolean(job.companyLogo?.trim());
 
   return (
     <Card className="group w-full overflow-hidden rounded-3xl border border-white/10 bg-zinc-900/90 p-0 shadow-xl transition-all duration-300 hover:-translate-y-1 hover:border-primary/40 hover:shadow-2xl">
@@ -28,25 +29,27 @@ export default function JobCard({ job }) {
         {/* Company Info */}
         <div className="flex w-full items-center justify-between gap-4">
           <div className="flex items-center gap-3">
-            {/* Company Logo */}
+            {/* Company Logo (fallback icon if logo is empty) */}
             <div className="flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-white p-2">
-              <img
-                src={job.companyLogo}
-                alt={`${job.companyName} logo`}
-                className="h-full w-full object-contain"
-              />
+              {hasLogo ? (
+                <img
+                  src={job.companyLogo}
+                  alt={`${job.companyName} logo`}
+                  className="h-full w-full object-contain"
+                />
+              ) : (
+                <Building2 size={24} className="text-zinc-700" />
+              )}
             </div>
 
             <div>
               <p className="text-sm text-zinc-400">Company</p>
-              <h3 className="font-semibold text-white">
-                {job.companyName}
-              </h3>
+              <h3 className="font-semibold text-white">{job.companyName}</h3>
             </div>
           </div>
 
           <span className="rounded-full bg-primary/10 px-3 py-1 text-xs font-medium capitalize text-primary">
-            {job.type.replace("-", " ")}
+            {job.type?.replace("-", " ")}
           </span>
         </div>
 
@@ -78,7 +81,7 @@ export default function JobCard({ job }) {
           {/* Category */}
           <div className="flex items-center gap-2 rounded-full bg-white/5 px-3 py-2 text-sm capitalize text-zinc-300">
             <BriefcaseBusiness size={15} className="text-primary" />
-            <span>{job.category}</span>
+            <span>{job.category?.replace(/-/g, " ")}</span>
           </div>
         </div>
       </Card.Header>
@@ -105,13 +108,13 @@ export default function JobCard({ job }) {
           </div>
         </div>
 
+        {/* Apply Button */}
         <Link
           href={`/jobs/${job._id}`}
-          color="primary"
-          className="w-full font-semibold sm:w-auto"
-          endcontent={<ArrowRight size={17} />}
+          className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-primary px-5 py-2.5 text-sm font-semibold text-white transition-opacity hover:opacity-90 sm:w-auto"
         >
           Apply Now
+          <ArrowRight size={17} />
         </Link>
       </Card.Footer>
     </Card>
